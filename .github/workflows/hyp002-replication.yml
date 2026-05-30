@@ -1,0 +1,56 @@
+name: HYP-002 GF137 Edge-Kernel Replication
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/hyp002-replication.yml"
+      - "hypotheses/HYP-002-edge-kernel-replication.md"
+      - "protocols/**"
+      - "scripts/**"
+
+jobs:
+  replicate:
+    name: Ubuntu replication gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Run HYP-002 benchmark
+        env:
+          NUMPY_SPEC: "numpy==1.26.4"
+        run: |
+          chmod +x scripts/run_hyp002.sh
+          ./scripts/run_hyp002.sh
+
+      - name: Assert HYP-002 pass flags
+        run: |
+          python scripts/assert_hyp002_pass.py
+
+      - name: Print markdown report
+        if: always()
+        run: |
+          cat outputs/edge_kernel_replication.md
+
+      - name: Upload replication artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyp002-edge-kernel-replication
+          path: |
+            outputs/edge_kernel_replication.json
+            outputs/edge_kernel_replication.md
+            outputs/build/compile_*.log

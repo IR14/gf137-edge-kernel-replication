@@ -1,0 +1,18 @@
+{
+  "created_utc": "2026-05-30T23:08:43+00:00",
+  "files": [
+    {
+      "path": "/Users/bach/Desktop/experiments/cosmo/falsifiable_physics_lab/hypotheses/HYP-002-edge-kernel-replication.md",
+      "sha256": "d8d287bf649e0331f2767b4a64eda670e0a073921af32df10e291513a4b7d82e"
+    },
+    {
+      "path": "/Users/bach/Desktop/experiments/cosmo/falsifiable_physics_lab/protocols/replication_gate.md",
+      "sha256": "6c8bafe84c2492bd7dab4f9e087c77ad9411aeae795f5adf577e0e4d8c6e1a10"
+    },
+    {
+      "path": "/Users/bach/Desktop/experiments/cosmo/falsifiable_physics_lab/protocols/freeze_protocol.md",
+      "sha256": "8ce421f091016ac20a5f8a38a032c5b3b208de1805e7b453248f26e1f1c7e814"
+    }
+  ],
+  "combined_sha256": "76456d36b6a85fec36fd40bb570043cc24971f95a160e5effece1f5f7d3f9855"
+}

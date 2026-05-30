@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.12.10 (main, Apr  9 2025, 03:49:38) [Clang 20.1.0 ]",
+    "numpy": "2.4.6",
+    "compiler": "/usr/bin/clang++",
+    "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  },
+  "config": {
+    "rows": 256,
+    "input_width": 64,
+    "hidden_width": 32,
+    "seed": 5137,
+    "repeats": 1000,
+    "trials": 5,
+    "field": 137,
+    "threshold": 42
+  },
+  "rows": [
+    {
+      "backend": "NumPy float32 modular",
+      "memory_bytes": 8452,
+      "time_1000_passes_ms": 86.27395799703663,
+      "mismatch_count": 0,
+      "notes": "same modular operation expressed with float32 arrays"
+    },
+    {
+      "backend": "NumPy uint32 GF(137) reference",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 189.61208299879218,
+      "mismatch_count": 0,
+      "notes": "vectorized Python reference, uint8 model storage"
+    },
+    {
+      "backend": "C++ portable O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 214.07033300056355,
+      "mismatch_count": 0,
+      "notes": "optimized portable scalar loop"
+    },
+    {
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 215.70583400171017,
+      "mismatch_count": 0,
+      "notes": "optimized native loop"
+    }
+  ],
+  "summary": {
+    "storage_ratio_float32_to_native": 4.0,
+    "speedup_float32_to_native": 0.399961171177005,
+    "pass_storage": true,
+    "pass_agreement": true,
+    "pass_speed": false
+  },
+  "interpretation": "Storage ratio float32/native GF(137) = 4.000x. Runtime speedup float32/native GF(137) = 0.400x. Pass storage=True, pass agreement=True, pass speed=False. This benchmark supports only the stated engineering replication claim; it does not establish a fundamental-physics result."
+}
