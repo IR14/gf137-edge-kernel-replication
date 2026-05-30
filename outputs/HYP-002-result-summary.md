@@ -69,10 +69,9 @@ requires the optimized row layout and ARM-friendly path in
 
 ## Interpretation
 
-This result supports only the stated engineering replication claim on the local
-machine.  It is not a fundamental-physics result.
-
-The next required step is replication on a second machine or CI runner.
+This local result supports only the stated engineering replication claim on the
+local machine.  It is not a fundamental-physics result.  The claim becomes
+stronger only after the VPS and CI checks below.
 
 ## VPS Replication
 
@@ -118,4 +117,15 @@ GitHub Actions status:
 
 ```text
 passed on ubuntu-24.04
+storage ratio = 4.000x
+runtime speedup = 2.550x
+mismatches = 0
+```
+
+CI artifact snapshot:
+
+```text
+outputs/ci_github_actions_ubuntu_20260531_summary.md
+outputs/ci_github_actions_ubuntu_20260531/edge_kernel_replication.json
+outputs/ci_github_actions_ubuntu_20260531/edge_kernel_replication.md
 ```

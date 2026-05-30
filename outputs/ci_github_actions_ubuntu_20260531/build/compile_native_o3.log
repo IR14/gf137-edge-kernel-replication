@@ -1,0 +1,6 @@
+command: /usr/bin/clang++ -std=c++17 -fPIC -shared -O3 -DNDEBUG -ffast-math -funroll-loops -march=native /home/runner/work/gf137-edge-kernel-replication/gf137-edge-kernel-replication/scripts/gf137_edge_kernel.cpp -o /home/runner/work/gf137-edge-kernel-replication/gf137-edge-kernel-replication/outputs/build/libgf137_edge_native_o3.so
+returncode: 0
+
+[stdout]
+
+[stderr]

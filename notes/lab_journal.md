@@ -101,6 +101,22 @@ GitHub Actions workflow:
 
 User reported the workflow job as green.
 
+Downloaded artifact:
+
+```text
+Edge Kernel Replication.zip
+```
+
+Parsed CI result:
+
+- platform: Linux Azure x86_64;
+- Python 3.12.13;
+- NumPy 1.26.4;
+- compiler: Ubuntu clang 18.1.3;
+- storage ratio: `4.000x`;
+- runtime speedup over NumPy float32 modular baseline: `2.550x`;
+- mismatches: `0`.
+
 Status update:
 
 - local Apple ARM: pass;
