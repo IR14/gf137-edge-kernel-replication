@@ -1,6 +1,6 @@
 # HYP-002 Result Summary
 
-Status: local pass, second-machine replication pass
+Status: local pass, VPS replication pass, GitHub Actions pass
 
 ## Freeze
 
@@ -102,7 +102,7 @@ failure.
 Next gate:
 
 ```text
-CI or third-machine replication with a pinned fallback dependency set.
+third-machine replication or richer baseline comparison
 ```
 
 CI workflow:
@@ -113,3 +113,9 @@ CI workflow:
 
 The workflow is intentionally strict.  It fails if any of the frozen pass flags
 are false.
+
+GitHub Actions status:
+
+```text
+passed on ubuntu-24.04
+```

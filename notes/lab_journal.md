@@ -84,3 +84,31 @@ Conclusion:
 - `HYP-002` passes the second-machine replication gate.
 - The effect is hardware-sensitive: strong on Apple ARM, modest on the VPS.
 - Next gate is CI or a third independent machine with dependency pinning.
+
+## 2026-05-31: HYP-002 GitHub Actions Pass
+
+Created public GitHub repository:
+
+```text
+IR14/gf137-edge-kernel-replication
+```
+
+GitHub Actions workflow:
+
+```text
+.github/workflows/hyp002-replication.yml
+```
+
+User reported the workflow job as green.
+
+Status update:
+
+- local Apple ARM: pass;
+- VPS Linux/x86_64: pass;
+- GitHub Actions Ubuntu: pass.
+
+Remaining caveat:
+
+- the benchmark still needs a richer baseline comparison against standard int8
+  inference tooling before it can be claimed as broadly useful beyond this
+  fixed modular-kernel setting.

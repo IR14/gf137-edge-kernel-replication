@@ -48,7 +48,7 @@ outputs/edge_kernel_replication.json
 ```
 
 The local result is not enough.  A Linux/x86_64 VPS replication passed with a
-smaller speedup.  The next gate is CI or a third machine.
+smaller speedup.  GitHub Actions also passed on Ubuntu.
 
 Old x86 note:
 
