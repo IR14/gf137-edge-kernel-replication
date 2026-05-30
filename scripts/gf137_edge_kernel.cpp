@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cmath>
 
 #if defined(__ARM_NEON) || defined(__ARM_NEON__)
 #include <arm_neon.h>
@@ -11,6 +12,14 @@ namespace {
 
 constexpr uint32_t kModulus = 137U;
 constexpr uint64_t kBarrettMu = (uint64_t{1} << 32) / kModulus;
+
+inline float mod137_float(float value) {
+    float residue = std::fmod(value, 137.0F);
+    if (residue < 0.0F) {
+        residue += 137.0F;
+    }
+    return residue;
+}
 
 inline uint8_t mod137_barrett(uint32_t value) {
     const uint32_t quotient = static_cast<uint32_t>(
@@ -141,6 +150,82 @@ inline uint8_t predict_one_portable(
     return static_cast<uint8_t>(mod137_barrett(out_acc) >= output_threshold ? 1U : 0U);
 }
 
+inline uint8_t predict_one_float32_modular(
+    const uint8_t* x,
+    const float* w1,
+    const float* b1,
+    const float* w2,
+    float b2,
+    int k_width,
+    int h_width,
+    float hidden_threshold,
+    float output_threshold
+) {
+    float hidden_acc[128];
+    for (int h = 0; h < h_width; ++h) {
+        hidden_acc[h] = b1[h];
+    }
+    for (int k = 0; k < k_width; ++k) {
+        const float x_value = static_cast<float>(x[k]);
+        if (x_value == 0.0F) {
+            continue;
+        }
+        const float* w_row = w1 + static_cast<int64_t>(k) * h_width;
+        for (int h = 0; h < h_width; ++h) {
+            hidden_acc[h] += x_value * w_row[h];
+        }
+    }
+
+    float out_acc = b2;
+    for (int h = 0; h < h_width; ++h) {
+        if (mod137_float(hidden_acc[h]) >= hidden_threshold) {
+            out_acc += w2[h];
+        }
+    }
+    return static_cast<uint8_t>(mod137_float(out_acc) >= output_threshold ? 1U : 0U);
+}
+
+inline uint8_t predict_one_plain_uint8(
+    const uint8_t* x,
+    const uint8_t* w1,
+    const uint8_t* b1,
+    const uint8_t* w2,
+    uint8_t b2,
+    int k_width,
+    int h_width,
+    uint32_t hidden_threshold,
+    uint32_t output_threshold
+) {
+    uint32_t hidden_acc[128];
+    for (int h = 0; h < h_width; ++h) {
+        hidden_acc[h] = static_cast<uint32_t>(b1[h]);
+    }
+    for (int k = 0; k < k_width; ++k) {
+        const uint32_t x_value = static_cast<uint32_t>(x[k]);
+        if (x_value == 0U) {
+            continue;
+        }
+        const uint8_t* w_row = w1 + static_cast<int64_t>(k) * h_width;
+        if (x_value == 1U) {
+            for (int h = 0; h < h_width; ++h) {
+                hidden_acc[h] += static_cast<uint32_t>(w_row[h]);
+            }
+        } else {
+            for (int h = 0; h < h_width; ++h) {
+                hidden_acc[h] += 2U * static_cast<uint32_t>(w_row[h]);
+            }
+        }
+    }
+
+    uint32_t out_acc = static_cast<uint32_t>(b2);
+    for (int h = 0; h < h_width; ++h) {
+        if (hidden_acc[h] >= hidden_threshold) {
+            out_acc += static_cast<uint32_t>(w2[h]);
+        }
+    }
+    return static_cast<uint8_t>(out_acc >= output_threshold ? 1U : 0U);
+}
+
 void predict_batch(
     const uint8_t* x,
     const uint8_t* w1,
@@ -171,6 +256,62 @@ void predict_batch(
         }
 #endif
         y[row] = predict_one_portable(
+            x + static_cast<int64_t>(row) * k_width,
+            w1,
+            b1,
+            w2,
+            b2[0],
+            k_width,
+            h_width,
+            hidden_threshold,
+            output_threshold
+        );
+    }
+}
+
+void predict_batch_float32_modular(
+    const uint8_t* x,
+    const float* w1,
+    const float* b1,
+    const float* w2,
+    const float* b2,
+    uint8_t* y,
+    int rows,
+    int k_width,
+    int h_width,
+    float hidden_threshold,
+    float output_threshold
+) {
+    for (int row = 0; row < rows; ++row) {
+        y[row] = predict_one_float32_modular(
+            x + static_cast<int64_t>(row) * k_width,
+            w1,
+            b1,
+            w2,
+            b2[0],
+            k_width,
+            h_width,
+            hidden_threshold,
+            output_threshold
+        );
+    }
+}
+
+void predict_batch_plain_uint8(
+    const uint8_t* x,
+    const uint8_t* w1,
+    const uint8_t* b1,
+    const uint8_t* w2,
+    const uint8_t* b2,
+    uint8_t* y,
+    int rows,
+    int k_width,
+    int h_width,
+    uint32_t hidden_threshold,
+    uint32_t output_threshold
+) {
+    for (int row = 0; row < rows; ++row) {
+        y[row] = predict_one_plain_uint8(
             x + static_cast<int64_t>(row) * k_width,
             w1,
             b1,
@@ -232,6 +373,68 @@ void gf137_predict_repeated(
 ) {
     for (int repeat = 0; repeat < repeats; ++repeat) {
         predict_batch(
+            x,
+            w1,
+            b1,
+            w2,
+            b2,
+            y,
+            rows,
+            k_width,
+            h_width,
+            hidden_threshold,
+            output_threshold
+        );
+    }
+}
+
+void float32_modular_predict_repeated(
+    const uint8_t* x,
+    const float* w1,
+    const float* b1,
+    const float* w2,
+    const float* b2,
+    uint8_t* y,
+    int rows,
+    int k_width,
+    int h_width,
+    float hidden_threshold,
+    float output_threshold,
+    int repeats
+) {
+    for (int repeat = 0; repeat < repeats; ++repeat) {
+        predict_batch_float32_modular(
+            x,
+            w1,
+            b1,
+            w2,
+            b2,
+            y,
+            rows,
+            k_width,
+            h_width,
+            hidden_threshold,
+            output_threshold
+        );
+    }
+}
+
+void plain_uint8_predict_repeated(
+    const uint8_t* x,
+    const uint8_t* w1,
+    const uint8_t* b1,
+    const uint8_t* w2,
+    const uint8_t* b2,
+    uint8_t* y,
+    int rows,
+    int k_width,
+    int h_width,
+    uint32_t hidden_threshold,
+    uint32_t output_threshold,
+    int repeats
+) {
+    for (int repeat = 0; repeat < repeats; ++repeat) {
+        predict_batch_plain_uint8(
             x,
             w1,
             b1,

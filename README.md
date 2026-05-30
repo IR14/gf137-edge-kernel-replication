@@ -32,7 +32,9 @@ and repeat on an independent dataset.
 ## Current Fast Replication Track
 
 `HYP-002` tests whether the GF(137) edge-inference storage/runtime claim
-survives a one-command reproduction.
+survives a one-command reproduction.  The benchmark now includes equivalent
+NumPy and C++ `float32` modular baselines, plus a non-equivalent plain `uint8_t`
+control for loop overhead.
 
 Run:
 
@@ -47,8 +49,14 @@ outputs/edge_kernel_replication.md
 outputs/edge_kernel_replication.json
 ```
 
+The current local Apple ARM run reports `4.000x` storage reduction,
+`4.585x` speedup against NumPy `float32` modular inference, and `5.198x`
+speedup against C++ `float32` modular inference, with zero mismatches in all
+equivalent rows.
+
 The local result is not enough.  A Linux/x86_64 VPS replication passed with a
-smaller speedup.  GitHub Actions also passed on Ubuntu.
+smaller speedup under the earlier baseline set.  GitHub Actions also passed on
+Ubuntu; rerun CI after benchmark changes and compare the uploaded artifact.
 
 Old x86 note:
 

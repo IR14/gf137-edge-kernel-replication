@@ -23,8 +23,10 @@ Primary metrics:
 Required baselines:
 
 - NumPy `float32`;
-- C++ scalar `uint8_t`;
-- C++ native loop with compiler optimizations;
+- NumPy `uint32` GF(137) reference;
+- C++ `float32` modular kernel with the same field operation;
+- C++ `uint8_t` plain-threshold kernel without residue reduction;
+- C++ portable and native GF(137) loops with compiler optimizations;
 - optional ARM NEON path when hardware is available.
 
 ## Pass Condition
@@ -33,7 +35,12 @@ The replication passes if an external machine reproduces:
 
 - approximately `4x` storage reduction relative to `float32`;
 - no output mismatch against the frozen byte-valued reference;
-- speedup over the NumPy `float32` baseline on the same machine.
+- speedup over the NumPy `float32` modular baseline on the same machine;
+- speedup over the C++ `float32` modular baseline on the same machine.
+
+The plain `uint8_t` row is a non-equivalent control. It measures loop and
+storage overhead without the GF(137) residue operation, so it is reported but
+not included in the exact-agreement gate.
 
 ## Kill Condition
 

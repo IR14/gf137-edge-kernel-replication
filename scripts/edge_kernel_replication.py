@@ -39,7 +39,8 @@ class BenchmarkRow:
     backend: str
     memory_bytes: int
     time_1000_passes_ms: float
-    mismatch_count: int
+    mismatch_count: int | None
+    agreement_required: bool
     notes: str
 
 
@@ -156,6 +157,7 @@ def compile_library(label: str, flags: list[str]) -> Path:
 def load_library(path: Path):
     lib = ctypes.CDLL(str(path))
     u8 = ctypes.POINTER(ctypes.c_uint8)
+    f32 = ctypes.POINTER(ctypes.c_float)
     lib.gf137_predict.argtypes = [
         u8,
         u8,
@@ -185,14 +187,48 @@ def load_library(path: Path):
         ctypes.c_int,
     ]
     lib.gf137_predict_repeated.restype = None
+    lib.float32_modular_predict_repeated.argtypes = [
+        u8,
+        f32,
+        f32,
+        f32,
+        f32,
+        u8,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_float,
+        ctypes.c_float,
+        ctypes.c_int,
+    ]
+    lib.float32_modular_predict_repeated.restype = None
+    lib.plain_uint8_predict_repeated.argtypes = [
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        u8,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_uint32,
+        ctypes.c_uint32,
+        ctypes.c_int,
+    ]
+    lib.plain_uint8_predict_repeated.restype = None
     return lib
 
 
-def ptr(array: np.ndarray):
+def ptr_u8(array: np.ndarray):
     return array.ctypes.data_as(ctypes.POINTER(ctypes.c_uint8))
 
 
-def run_cpp(lib, vectors: dict[str, np.ndarray], repeats: int) -> tuple[float, np.ndarray]:
+def ptr_f32(array: np.ndarray):
+    return array.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+
+
+def run_cpp_gf137(lib, vectors: dict[str, np.ndarray], repeats: int) -> tuple[float, np.ndarray]:
     x = np.ascontiguousarray(vectors["x"], dtype=np.uint8)
     w1 = np.ascontiguousarray(vectors["w1"], dtype=np.uint8)
     b1 = np.ascontiguousarray(vectors["b1"], dtype=np.uint8)
@@ -201,17 +237,78 @@ def run_cpp(lib, vectors: dict[str, np.ndarray], repeats: int) -> tuple[float, n
     y = np.empty(x.shape[0], dtype=np.uint8)
     start = time.perf_counter()
     lib.gf137_predict_repeated(
-        ptr(x),
-        ptr(w1),
-        ptr(b1),
-        ptr(w2),
-        ptr(b2),
-        ptr(y),
+        ptr_u8(x),
+        ptr_u8(w1),
+        ptr_u8(b1),
+        ptr_u8(w2),
+        ptr_u8(b2),
+        ptr_u8(y),
         x.shape[0],
         x.shape[1],
         w1.shape[1],
         THRESHOLD,
         THRESHOLD,
+        repeats,
+    )
+    return (time.perf_counter() - start) * 1000.0, y.copy()
+
+
+def run_cpp_float32_modular(
+    lib, vectors: dict[str, np.ndarray], repeats: int
+) -> tuple[float, np.ndarray]:
+    x = np.ascontiguousarray(vectors["x"], dtype=np.uint8)
+    w1 = np.ascontiguousarray(vectors["w1"], dtype=np.float32)
+    b1 = np.ascontiguousarray(vectors["b1"], dtype=np.float32)
+    w2 = np.ascontiguousarray(vectors["w2"], dtype=np.float32)
+    b2 = np.ascontiguousarray(vectors["b2"], dtype=np.float32)
+    y = np.empty(x.shape[0], dtype=np.uint8)
+    start = time.perf_counter()
+    lib.float32_modular_predict_repeated(
+        ptr_u8(x),
+        ptr_f32(w1),
+        ptr_f32(b1),
+        ptr_f32(w2),
+        ptr_f32(b2),
+        ptr_u8(y),
+        x.shape[0],
+        x.shape[1],
+        w1.shape[1],
+        float(THRESHOLD),
+        float(THRESHOLD),
+        repeats,
+    )
+    return (time.perf_counter() - start) * 1000.0, y.copy()
+
+
+def plain_uint8_thresholds(k_width: int, h_width: int) -> tuple[int, int]:
+    hidden_threshold = k_width * (P_FIELD // 2)
+    output_threshold = h_width * (P_FIELD // 2)
+    return hidden_threshold, output_threshold
+
+
+def run_cpp_plain_uint8(
+    lib, vectors: dict[str, np.ndarray], repeats: int
+) -> tuple[float, np.ndarray]:
+    x = np.ascontiguousarray(vectors["x"], dtype=np.uint8)
+    w1 = np.ascontiguousarray(vectors["w1"], dtype=np.uint8)
+    b1 = np.ascontiguousarray(vectors["b1"], dtype=np.uint8)
+    w2 = np.ascontiguousarray(vectors["w2"], dtype=np.uint8)
+    b2 = np.ascontiguousarray(vectors["b2"], dtype=np.uint8)
+    y = np.empty(x.shape[0], dtype=np.uint8)
+    hidden_threshold, output_threshold = plain_uint8_thresholds(x.shape[1], w1.shape[1])
+    start = time.perf_counter()
+    lib.plain_uint8_predict_repeated(
+        ptr_u8(x),
+        ptr_u8(w1),
+        ptr_u8(b1),
+        ptr_u8(w2),
+        ptr_u8(b2),
+        ptr_u8(y),
+        x.shape[0],
+        x.shape[1],
+        w1.shape[1],
+        hidden_threshold,
+        output_threshold,
         repeats,
     )
     return (time.perf_counter() - start) * 1000.0, y.copy()
@@ -258,9 +355,10 @@ def write_markdown(payload: dict) -> None:
         ]
     )
     for row in rows:
+        mismatches = "n/a" if row["mismatch_count"] is None else str(row["mismatch_count"])
         lines.append(
             f"| {row['backend']} | {row['memory_bytes']} | "
-            f"{row['time_1000_passes_ms']:.6f} | {row['mismatch_count']} | "
+            f"{row['time_1000_passes_ms']:.6f} | {mismatches} | "
             f"{row['notes']} |"
         )
     lines.extend(
@@ -301,6 +399,7 @@ def main() -> int:
             memory_bytes=model_bytes(vectors, 4),
             time_1000_passes_ms=numpy_float_time,
             mismatch_count=int(np.count_nonzero(numpy_float_y != reference)),
+            agreement_required=True,
             notes="same modular operation expressed with float32 arrays",
         )
     )
@@ -316,6 +415,7 @@ def main() -> int:
             memory_bytes=model_bytes(vectors, 1),
             time_1000_passes_ms=numpy_uint_time,
             mismatch_count=int(np.count_nonzero(numpy_uint_y != reference)),
+            agreement_required=True,
             notes="vectorized Python reference, uint8 model storage",
         )
     )
@@ -326,40 +426,82 @@ def main() -> int:
     native_path = compile_library("native_o3", native_flags)
 
     for label, path, note in [
-        ("C++ portable O3 GF(137)", portable_path, "optimized portable scalar loop"),
-        ("C++ native O3 GF(137)", native_path, "optimized native loop"),
+        ("portable", portable_path, "portable scalar flags"),
+        ("native", native_path, "native compiler flags"),
     ]:
         lib = load_library(path)
-        timings = []
-        cpp_y = None
-        for _ in range(args.trials):
-            elapsed, cpp_y = run_cpp(lib, vectors, args.repeats)
-            timings.append(elapsed)
-        assert cpp_y is not None
-        rows.append(
-            BenchmarkRow(
-                backend=label,
-                memory_bytes=model_bytes(vectors, 1),
-                time_1000_passes_ms=float(np.median(timings)),
-                mismatch_count=int(np.count_nonzero(cpp_y != reference)),
-                notes=note,
+        for backend_name, runner, dtype_size, agreement_required, row_note in [
+            (
+                f"C++ {label} O3 float32 modular",
+                run_cpp_float32_modular,
+                4,
+                True,
+                f"same modular arithmetic with float32 model storage, {note}",
+            ),
+            (
+                f"C++ {label} O3 uint8 plain threshold",
+                run_cpp_plain_uint8,
+                1,
+                False,
+                f"same topology without GF(137) residue reductions, {note}",
+            ),
+            (
+                f"C++ {label} O3 GF(137)",
+                run_cpp_gf137,
+                1,
+                True,
+                f"optimized GF(137) kernel, {note}",
+            ),
+        ]:
+            timings = []
+            cpp_y = None
+            for _ in range(args.trials):
+                elapsed, cpp_y = runner(lib, vectors, args.repeats)
+                timings.append(elapsed)
+            assert cpp_y is not None
+            mismatch_count = (
+                int(np.count_nonzero(cpp_y != reference)) if agreement_required else None
             )
-        )
+            rows.append(
+                BenchmarkRow(
+                    backend=backend_name,
+                    memory_bytes=model_bytes(vectors, dtype_size),
+                    time_1000_passes_ms=float(np.median(timings)),
+                    mismatch_count=mismatch_count,
+                    agreement_required=agreement_required,
+                    notes=row_note,
+                )
+            )
 
-    float_row = rows[0]
-    native_row = rows[-1]
-    storage_ratio = float_row.memory_bytes / native_row.memory_bytes
-    speedup = float_row.time_1000_passes_ms / native_row.time_1000_passes_ms
+    rows_by_backend = {row.backend: row for row in rows}
+    float_row = rows_by_backend["NumPy float32 modular"]
+    native_float_row = rows_by_backend["C++ native O3 float32 modular"]
+    native_plain_row = rows_by_backend["C++ native O3 uint8 plain threshold"]
+    native_gf_row = rows_by_backend["C++ native O3 GF(137)"]
+    storage_ratio = float_row.memory_bytes / native_gf_row.memory_bytes
+    speedup_numpy_float = float_row.time_1000_passes_ms / native_gf_row.time_1000_passes_ms
+    speedup_cpp_float = (
+        native_float_row.time_1000_passes_ms / native_gf_row.time_1000_passes_ms
+    )
+    speed_ratio_plain_uint8 = (
+        native_plain_row.time_1000_passes_ms / native_gf_row.time_1000_passes_ms
+    )
     pass_storage = storage_ratio >= 3.9
-    pass_agreement = all(row.mismatch_count == 0 for row in rows)
-    pass_speed = speedup > 1.0
+    pass_agreement = all(
+        row.mismatch_count == 0 for row in rows if row.agreement_required
+    )
+    pass_speed = speedup_numpy_float > 1.0 and speedup_cpp_float > 1.0
     interpretation = (
         f"Storage ratio float32/native GF(137) = {storage_ratio:.3f}x. "
-        f"Runtime speedup float32/native GF(137) = {speedup:.3f}x. "
+        f"Runtime speedup NumPy float32/native GF(137) = {speedup_numpy_float:.3f}x. "
+        f"Runtime speedup C++ float32/native GF(137) = {speedup_cpp_float:.3f}x. "
+        f"Native plain uint8/native GF(137) runtime ratio = {speed_ratio_plain_uint8:.3f}x. "
         f"Pass storage={pass_storage}, pass agreement={pass_agreement}, "
         f"pass speed={pass_speed}. "
-        "This benchmark supports only the stated engineering replication claim; "
-        "it does not establish a fundamental-physics result."
+        "The plain uint8 row is intentionally non-equivalent and is included only as a "
+        "lower-level control for loop and storage overhead. This benchmark supports only "
+        "the stated engineering replication claim; it does not establish a "
+        "fundamental-physics result."
     )
 
     payload = {
@@ -377,7 +519,9 @@ def main() -> int:
         "rows": [asdict(row) for row in rows],
         "summary": {
             "storage_ratio_float32_to_native": storage_ratio,
-            "speedup_float32_to_native": speedup,
+            "speedup_numpy_float32_to_native_gf137": speedup_numpy_float,
+            "speedup_cpp_float32_to_native_gf137": speedup_cpp_float,
+            "speed_ratio_native_plain_uint8_to_native_gf137": speed_ratio_plain_uint8,
             "pass_storage": pass_storage,
             "pass_agreement": pass_agreement,
             "pass_speed": pass_speed,
