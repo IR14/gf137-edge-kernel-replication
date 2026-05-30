@@ -54,9 +54,13 @@ The current local Apple ARM run reports `4.000x` storage reduction,
 speedup against C++ `float32` modular inference, with zero mismatches in all
 equivalent rows.
 
-The local result is not enough.  A Linux/x86_64 VPS replication passed with a
-smaller speedup under the earlier baseline set.  GitHub Actions also passed on
-Ubuntu for the expanded baseline matrix:
+The local result is not enough.  A Linux/x86_64 VPS replication also passed
+under the expanded baseline matrix: `4.000x` storage reduction, `1.295x`
+speedup against NumPy `float32` modular inference, `1.061x` speedup against
+C++ `float32` modular inference, and zero mismatches in all equivalent rows.
+See `outputs/vps_vds2640757_expanded_edge_kernel_replication.md`.
+
+GitHub Actions also passed on Ubuntu for the expanded baseline matrix:
 [`run 26698037019`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698037019).
 
 Old x86 note:

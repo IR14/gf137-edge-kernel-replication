@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "platform": "Linux-6.8.0-110-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]",
+    "numpy": "1.26.4",
+    "compiler": "/usr/bin/g++",
+    "compiler_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "config": {
+    "rows": 256,
+    "input_width": 64,
+    "hidden_width": 32,
+    "seed": 5137,
+    "repeats": 1000,
+    "trials": 5,
+    "field": 137,
+    "threshold": 42
+  },
+  "rows": [
+    {
+      "backend": "NumPy float32 modular",
+      "memory_bytes": 8452,
+      "time_1000_passes_ms": 320.711022708565,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "same modular operation expressed with float32 arrays"
+    },
+    {
+      "backend": "NumPy uint32 GF(137) reference",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 729.4566058553755,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "vectorized Python reference, uint8 model storage"
+    },
+    {
+      "backend": "C++ portable O3 float32 modular",
+      "memory_bytes": 8452,
+      "time_1000_passes_ms": 310.11596973985434,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "same modular arithmetic with float32 model storage, portable scalar flags"
+    },
+    {
+      "backend": "C++ portable O3 uint8 plain threshold",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 217.9529508575797,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "same topology without GF(137) residue reductions, portable scalar flags"
+    },
+    {
+      "backend": "C++ portable O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 234.1457330621779,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "optimized GF(137) kernel, portable scalar flags"
+    },
+    {
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 8452,
+      "time_1000_passes_ms": 262.83656107261777,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "same modular arithmetic with float32 model storage, native compiler flags"
+    },
+    {
+      "backend": "C++ native O3 uint8 plain threshold",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 207.70532311871648,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "same topology without GF(137) residue reductions, native compiler flags"
+    },
+    {
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_1000_passes_ms": 247.64749594032764,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "optimized GF(137) kernel, native compiler flags"
+    }
+  ],
+  "summary": {
+    "storage_ratio_float32_to_native": 4.0,
+    "speedup_numpy_float32_to_native_gf137": 1.2950303474332021,
+    "speedup_cpp_float32_to_native_gf137": 1.0613334089029112,
+    "speed_ratio_native_plain_uint8_to_native_gf137": 0.8387136010806444,
+    "pass_storage": true,
+    "pass_agreement": true,
+    "pass_speed": true
+  },
+  "interpretation": "Storage ratio float32/native GF(137) = 4.000x. Runtime speedup NumPy float32/native GF(137) = 1.295x. Runtime speedup C++ float32/native GF(137) = 1.061x. Native plain uint8/native GF(137) runtime ratio = 0.839x. Pass storage=True, pass agreement=True, pass speed=True. The plain uint8 row is intentionally non-equivalent and is included only as a lower-level control for loop and storage overhead. This benchmark supports only the stated engineering replication claim; it does not establish a fundamental-physics result."
+}
