@@ -107,6 +107,9 @@ zero mismatches in equivalent rows, and GF(137) speedups over C++ `float32`
 modular inference on `3/3` shapes.  Plain `uint8_t` is faster on `1/3` shapes,
 which is recorded as an expected limitation rather than hidden.
 
+The Ubuntu CI sweep also passed:
+[`run 26698321050`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698321050).
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
