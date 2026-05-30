@@ -56,7 +56,8 @@ equivalent rows.
 
 The local result is not enough.  A Linux/x86_64 VPS replication passed with a
 smaller speedup under the earlier baseline set.  GitHub Actions also passed on
-Ubuntu; rerun CI after benchmark changes and compare the uploaded artifact.
+Ubuntu for the expanded baseline matrix:
+[`run 26698037019`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698037019).
 
 Old x86 note:
 
