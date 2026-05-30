@@ -1,0 +1,59 @@
+name: HYP-003 Quantized Baseline Sweep
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/hyp003-quantized-baselines.yml"
+      - "hypotheses/HYP-003-standard-quantized-baselines.md"
+      - "scripts/quantized_baseline_sweep.py"
+      - "scripts/run_hyp003.sh"
+      - "scripts/assert_hyp003_pass.py"
+      - "scripts/edge_kernel_replication.py"
+      - "scripts/gf137_edge_kernel.cpp"
+
+jobs:
+  sweep:
+    name: Ubuntu quantized baseline sweep
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Run HYP-003 sweep
+        env:
+          NUMPY_SPEC: "numpy==1.26.4"
+        run: |
+          chmod +x scripts/run_hyp003.sh
+          ./scripts/run_hyp003.sh
+
+      - name: Assert HYP-003 pass flags
+        run: |
+          python scripts/assert_hyp003_pass.py
+
+      - name: Print markdown report
+        if: always()
+        run: |
+          cat outputs/quantized_baseline_sweep.md
+
+      - name: Upload sweep artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyp003-quantized-baseline-sweep
+          path: |
+            outputs/quantized_baseline_sweep.json
+            outputs/quantized_baseline_sweep.md
+            outputs/build/compile_hyp003_native_o3.log

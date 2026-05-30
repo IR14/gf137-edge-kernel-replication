@@ -81,6 +81,32 @@ CI:
 The CI job runs the same benchmark on `ubuntu-24.04`, asserts the three pass
 flags, and uploads the JSON/Markdown report as an artifact.
 
+## Current Baseline Expansion
+
+`HYP-003` expands the engineering audit from one matrix size to a three-shape
+sweep against stricter quantized baselines.  It keeps the equivalent C++
+`float32` modular baseline and adds a non-equivalent plain `uint8_t` control to
+show the cost of the GF(137) residue operation.
+
+Run:
+
+```bash
+./scripts/run_hyp003.sh
+python scripts/assert_hyp003_pass.py
+```
+
+Outputs:
+
+```text
+outputs/quantized_baseline_sweep.md
+outputs/quantized_baseline_sweep.json
+```
+
+The current Apple ARM sweep reports `4.000x` storage reduction for all shapes,
+zero mismatches in equivalent rows, and GF(137) speedups over C++ `float32`
+modular inference on `3/3` shapes.  Plain `uint8_t` is faster on `1/3` shapes,
+which is recorded as an expected limitation rather than hidden.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
