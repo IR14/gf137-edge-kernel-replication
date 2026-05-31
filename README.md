@@ -110,6 +110,32 @@ which is recorded as an expected limitation rather than hidden.
 The Ubuntu CI sweep also passed:
 [`run 26698321050`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698321050).
 
+## Current Industrial Baseline
+
+`HYP-004` adds a hand-written C++ int8 dense-inference proxy with int32 bias and
+accumulation.  This row is not functionally equivalent to GF(137); it is a
+standard quantized baseline for raw deployment-style inference.
+
+Run:
+
+```bash
+./scripts/run_hyp004.sh
+python scripts/assert_hyp004_pass.py
+```
+
+Outputs:
+
+```text
+outputs/industrial_int8_baseline.md
+outputs/industrial_int8_baseline.json
+```
+
+The current Apple ARM audit reports valid measurements, zero mismatches on the
+equivalent GF(137) rows, and int8 model storage within `1.25x` of GF(137) on all
+three shapes.  GF(137) is faster than the hand-written int8 proxy on `3/3`
+shapes in this local run, but this is explicitly marked for external
+replication before any stronger speed claim.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.

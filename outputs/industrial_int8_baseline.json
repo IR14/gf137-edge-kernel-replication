@@ -1,0 +1,148 @@
+{
+  "metadata": {
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.12.10 (main, Apr  9 2025, 03:49:38) [Clang 20.1.0 ]",
+    "numpy": "2.4.6",
+    "compiler": "/usr/bin/clang++",
+    "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  },
+  "config": {
+    "seed": 5137,
+    "repeats": 500,
+    "trials": 3
+  },
+  "rows": [
+    {
+      "shape": "small",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 2180,
+      "time_ms": 10.844040996744297,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 kernel"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 545,
+      "time_ms": 6.074666998756584,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 596,
+      "time_ms": 6.357457998092286,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent int8 dense kernel with int32 accumulation"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 8452,
+      "time_ms": 48.75770900252974,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_ms": 9.370416999445297,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 2212,
+      "time_ms": 32.47100000589853,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent int8 dense kernel with int32 accumulation"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 33284,
+      "time_ms": 372.9667910010903,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 8321,
+      "time_ms": 164.87324999616249,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 8516,
+      "time_ms": 166.14766699785832,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent int8 dense kernel with int32 accumulation"
+    }
+  ],
+  "shape_summaries": [
+    {
+      "shape": {
+        "label": "small",
+        "rows": 128,
+        "input_width": 32,
+        "hidden_width": 16
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "memory_ratio_int8_to_gf137": 1.0935779816513762,
+      "speedup_float32_to_gf137": 1.7851251762382945,
+      "speed_ratio_int8_to_gf137": 1.0465525105151585,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "hyp002",
+        "rows": 256,
+        "input_width": 64,
+        "hidden_width": 32
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "memory_ratio_int8_to_gf137": 1.0468528159015618,
+      "speedup_float32_to_gf137": 5.203365976713316,
+      "speed_ratio_int8_to_gf137": 3.465267341658405,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "medium",
+        "rows": 512,
+        "input_width": 128,
+        "hidden_width": 64
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "memory_ratio_int8_to_gf137": 1.0234346833313304,
+      "speedup_float32_to_gf137": 2.2621425307608805,
+      "speed_ratio_int8_to_gf137": 1.0077296772018838,
+      "equivalent_mismatches_zero": true
+    }
+  ],
+  "summary": {
+    "pass_measurement": true,
+    "pass_agreement": true,
+    "pass_int8_memory_profile": true,
+    "standard_int8_faster_shapes": 0,
+    "gf137_faster_shapes": 3
+  },
+  "interpretation": "Measurement pass=True. Agreement pass=True. Int8 memory profile pass=True. Standard int8 is faster on 0/3 shapes; GF(137) is faster on 3/3 shapes. GF(137) is faster than the standard int8 proxy on every tested shape in this run. This should be rechecked on external machines. This audit does not establish a fundamental-physics result."
+}
