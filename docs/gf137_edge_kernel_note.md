@@ -39,6 +39,7 @@ External checks:
 | Linux VPS x86_64, HYP-002 | `outputs/vps_vds2640757_expanded_edge_kernel_replication.md` |
 | Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
 | Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
+| Linux VPS x86_64, HYP-005 | `outputs/vps_vds2640757_hyp005_onnxruntime_int8_baseline.md` |
 
 ## HYP-002: Single-Shape Replication
 
@@ -141,11 +142,14 @@ to test the deployment boundary against a real graph runtime.
 | Environment | Runtime available | Measurement pass | Agreement pass | ONNX int8 faster | GF(137) faster |
 |---|---|---|---|---:|---:|
 | Apple ARM local | pass | pass | pass | 2/3 | 1/3 |
+| Linux VPS x86_64 | pass | pass | pass | 2/3 | 1/3 |
 
 In the current local run, ONNX Runtime int8 is faster than GF(137) in two of
 the three shapes and GF(137) is faster in one shape.  ONNX Runtime is also
-faster than the hand-written C++ int8 proxy in all three shapes.  This is the
-clearest current evidence that deployment-speed claims must be limited and
+faster than the hand-written C++ int8 proxy in all three local shapes.  The
+Linux VPS run confirms the same ONNX-vs-GF(137) split, with ONNX faster than the
+hand-written C++ int8 proxy in two of the three shapes.  This is the clearest
+current evidence that deployment-speed claims must be limited and
 shape-specific.
 
 ## Current Claim

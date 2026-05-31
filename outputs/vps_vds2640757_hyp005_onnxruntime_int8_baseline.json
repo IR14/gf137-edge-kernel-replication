@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "platform": "Linux-6.8.0-110-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]",
+    "numpy": "1.26.4",
+    "compiler": "/usr/bin/g++",
+    "compiler_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "runtime": {
+    "onnx": "1.21.0",
+    "onnxruntime": "1.26.0"
+  },
+  "config": {
+    "seed": 5137,
+    "repeats": 200,
+    "trials": 3
+  },
+  "rows": [
+    {
+      "shape": "small",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 545,
+      "time_ms": 6.931802723556757,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 596,
+      "time_ms": 6.2844473868608475,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent C++ int8 dense kernel"
+    },
+    {
+      "shape": "small",
+      "backend": "ONNX Runtime CPU MatMulInteger int8",
+      "memory_bytes": 596,
+      "time_ms": 13.076371978968382,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "external runtime int8 graph, single-thread CPU provider"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_ms": 47.425458673387766,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 2212,
+      "time_ms": 38.981019984930754,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent C++ int8 dense kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "ONNX Runtime CPU MatMulInteger int8",
+      "memory_bytes": 2212,
+      "time_ms": 34.48899416252971,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "external runtime int8 graph, single-thread CPU provider"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 8321,
+      "time_ms": 240.16617191955447,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent finite-field kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 standard int8 proxy",
+      "memory_bytes": 8516,
+      "time_ms": 273.6946721561253,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent C++ int8 dense kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "ONNX Runtime CPU MatMulInteger int8",
+      "memory_bytes": 8516,
+      "time_ms": 165.4983451589942,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "external runtime int8 graph, single-thread CPU provider"
+    }
+  ],
+  "shape_summaries": [
+    {
+      "shape": {
+        "label": "small",
+        "rows": 128,
+        "input_width": 32,
+        "hidden_width": 16
+      },
+      "memory_ratio_int8_to_gf137": 1.0935779816513762,
+      "speed_ratio_cpp_int8_to_gf137": 0.9066108251326941,
+      "speed_ratio_onnx_int8_to_gf137": 1.8864316398575756,
+      "speed_ratio_onnx_int8_to_cpp_int8": 2.080751285516001,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "hyp002",
+        "rows": 256,
+        "input_width": 64,
+        "hidden_width": 32
+      },
+      "memory_ratio_int8_to_gf137": 1.0468528159015618,
+      "speed_ratio_cpp_int8_to_gf137": 0.8219429200123791,
+      "speed_ratio_onnx_int8_to_gf137": 0.7272253158382799,
+      "speed_ratio_onnx_int8_to_cpp_int8": 0.8847637690307342,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "medium",
+        "rows": 512,
+        "input_width": 128,
+        "hidden_width": 64
+      },
+      "memory_ratio_int8_to_gf137": 1.0234346833313304,
+      "speed_ratio_cpp_int8_to_gf137": 1.13960542389709,
+      "speed_ratio_onnx_int8_to_gf137": 0.6890993175109988,
+      "speed_ratio_onnx_int8_to_cpp_int8": 0.6046823778308259,
+      "equivalent_mismatches_zero": true
+    }
+  ],
+  "summary": {
+    "pass_runtime_available": true,
+    "pass_measurement": true,
+    "pass_agreement": true,
+    "pass_int8_memory_profile": true,
+    "onnx_int8_faster_than_gf137_shapes": 2,
+    "gf137_faster_than_onnx_int8_shapes": 1,
+    "onnx_int8_faster_than_cpp_int8_shapes": 2
+  },
+  "interpretation": "Runtime available=True. Measurement pass=True. Agreement pass=True. Int8 memory profile pass=True. ONNX Runtime int8 is faster than GF(137) on 2/3 shapes; GF(137) is faster on 1/3 shapes. ONNX Runtime int8 is faster than the C++ int8 proxy on 2/3 shapes. The ONNX Runtime int8 comparison is shape-dependent. This audit does not establish a fundamental-physics result."
+}

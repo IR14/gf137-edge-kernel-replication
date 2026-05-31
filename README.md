@@ -182,6 +182,11 @@ semantics and shape-specific performance, not general int8 deployment speed.
 The Ubuntu CI audit also passed:
 [`run 26699031559`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26699031559).
 
+The Linux/x86_64 VPS audit confirms the same main boundary: ONNX Runtime int8
+is faster than GF(137) on `2/3` shapes and GF(137) is faster on `1/3` shapes.
+ONNX Runtime is faster than the hand-written C++ int8 proxy on `2/3` shapes on
+that VPS run.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
