@@ -19,10 +19,10 @@ Find one falsifiable prediction that is:
 - cheaper to test than to argue about;
 - reproducible by an external reader from public data or a simple lab setup.
 
-## Current Best Candidate
+## Current Best Candidates
 
-The strongest path is not a broad "theory of everything" claim.  The strongest
-path is a blind residual prediction:
+The strongest physics path is not a broad "theory of everything" claim.  It is
+a blind residual prediction:
 
 > Define one finite-field-derived correction, freeze it, and test whether it
 > predicts an independent cosmological or particle-data residual that standard
@@ -31,12 +31,16 @@ path is a blind residual prediction:
 If the prediction fails, record the failure.  If it survives, narrow the claim
 and repeat on an independent dataset.
 
+The strongest engineering path is separate: test whether GF(137) gives a useful
+recoverability property under erasures, independent of raw runtime speed.  That
+track is now represented by `HYP-006`.
+
 ## Technical Note
 
 The current GF(137) edge-kernel replication result is summarized in
 `docs/gf137_edge_kernel_note.md`.  It is the best entry point for the engineering
 track because it separates supported claims, limitations, kill conditions, and
-the next ONNX/TFLite baseline step.
+the next finite-field repair baseline.
 
 ## Release Package
 
@@ -202,6 +206,34 @@ The Linux/x86_64 VPS audit confirms the same main boundary: ONNX Runtime int8
 is faster than GF(137) on `2/3` shapes and GF(137) is faster on `1/3` shapes.
 ONNX Runtime is faster than the hand-written C++ int8 proxy on `2/3` shapes on
 that VPS run.
+
+## Current Repair Baseline
+
+`HYP-006` moves away from raw speed claims and tests a different finite-field
+property: exact erasure repair.  It implements a small Reed-Solomon-style
+`RS(26,16)` code over GF(137), where 16 payload symbols are encoded into 26
+axes and recovered after 10 erased axes.
+
+Run:
+
+```bash
+./scripts/run_hyp006.sh
+python scripts/assert_hyp006_pass.py
+```
+
+Outputs:
+
+```text
+outputs/gf137_erasure_repair.md
+outputs/gf137_erasure_repair.json
+```
+
+The current Apple ARM audit reports exact GF(137) recovery on `2000/2000`
+random erasure trials and `6/6` deterministic adversarial erasure patterns.
+The raw no-parity control fails under the same erasure budget, and 2x direct
+repetition uses more storage while remaining unsafe against paired adversarial
+erasures.  This supports an erasure-repair claim only; it is not semantic
+compression, cryptography, or a physics result.
 
 ## Ground Rules
 

@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+"""Fail CI unless the HYP-006 erasure-repair audit gate passes."""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+
+def main() -> int:
+    path = Path("outputs/gf137_erasure_repair.json")
+    if not path.exists():
+        print(f"missing result file: {path}", file=sys.stderr)
+        return 2
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    summary = payload.get("summary", {})
+    required = ["pass_rs_repair", "pass_controls", "pass_storage_boundary"]
+    failed = [key for key in required if not summary.get(key)]
+
+    print(json.dumps(summary, indent=2))
+    if failed:
+        print(f"HYP-006 gate failed: {', '.join(failed)}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

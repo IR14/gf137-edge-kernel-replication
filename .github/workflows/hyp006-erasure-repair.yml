@@ -1,0 +1,49 @@
+name: HYP-006 GF(137) Erasure Repair
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/hyp006-erasure-repair.yml"
+      - "hypotheses/HYP-006-gf137-erasure-repair.md"
+      - "scripts/gf137_erasure_repair.py"
+      - "scripts/run_hyp006.sh"
+      - "scripts/assert_hyp006_pass.py"
+
+jobs:
+  erasure-repair:
+    name: Ubuntu GF(137) erasure-repair audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run HYP-006 repair audit
+        run: |
+          chmod +x scripts/run_hyp006.sh
+          ./scripts/run_hyp006.sh
+
+      - name: Assert HYP-006 pass flags
+        run: |
+          python scripts/assert_hyp006_pass.py
+
+      - name: Print markdown report
+        if: always()
+        run: |
+          cat outputs/gf137_erasure_repair.md
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyp006-gf137-erasure-repair
+          path: |
+            outputs/gf137_erasure_repair.json
+            outputs/gf137_erasure_repair.md

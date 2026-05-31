@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.13.5 (v3.13.5:6cb20a219a8, Jun 11 2025, 12:23:45) [Clang 16.0.0 (clang-1600.0.26.6)]"
+  },
+  "config": {
+    "field": 137,
+    "axes": 26,
+    "payload_symbols": 16,
+    "erasure_budget": 10,
+    "seed": 5137,
+    "random_trials": 2000
+  },
+  "schemes": [
+    {
+      "scheme": "GF(137) RS(26,16)",
+      "storage_symbols": 26,
+      "expansion_vs_raw": 1.625,
+      "random_trials": 2000,
+      "random_successes": 2000,
+      "random_success_rate": 1.0,
+      "adversarial_patterns": 6,
+      "adversarial_successes": 6,
+      "adversarial_success_rate": 1.0,
+      "worst_case_guarantee_under_budget": true,
+      "notes": "MDS polynomial code over GF(137); any 16 surviving axes recover payload."
+    },
+    {
+      "scheme": "Raw 16-symbol payload",
+      "storage_symbols": 16,
+      "expansion_vs_raw": 1.0,
+      "random_trials": 2000,
+      "random_successes": 0,
+      "random_success_rate": 0.0,
+      "adversarial_patterns": 6,
+      "adversarial_successes": 1,
+      "adversarial_success_rate": 0.16666666666666666,
+      "worst_case_guarantee_under_budget": false,
+      "notes": "Compact storage without parity; any erased payload slot loses information."
+    },
+    {
+      "scheme": "2x direct repetition",
+      "storage_symbols": 32,
+      "expansion_vs_raw": 2.0,
+      "random_trials": 2000,
+      "random_successes": 263,
+      "random_success_rate": 0.1315,
+      "adversarial_patterns": 3,
+      "adversarial_successes": 0,
+      "adversarial_success_rate": 0.0,
+      "worst_case_guarantee_under_budget": false,
+      "notes": "Simple duplicate storage; larger than RS(26,16) and not safe against adversarial paired erasures."
+    }
+  ],
+  "summary": {
+    "pass_rs_repair": true,
+    "pass_controls": true,
+    "pass_storage_boundary": true,
+    "rs_random_success_rate": 1.0,
+    "raw_random_success_rate": 0.0,
+    "repetition_random_success_rate": 0.1315
+  },
+  "interpretation": "GF(137) RS(26,16) repair pass=True. Control limitation pass=True. RS storage is 26 symbols versus 32 symbols for 2x repetition, so storage-boundary pass=True. The result supports an exact finite-field erasure-repair property, not semantic compression, cryptography, or a fundamental-physics claim."
+}

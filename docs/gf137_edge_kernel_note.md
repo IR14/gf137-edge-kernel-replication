@@ -19,7 +19,7 @@ The tested claim is narrower:
 
 ## Repository Evidence
 
-The current evidence is split into three hypothesis tracks:
+The current evidence is split into five hypothesis tracks:
 
 | Track | Purpose | Main output |
 |---|---|---|
@@ -27,6 +27,7 @@ The current evidence is split into three hypothesis tracks:
 | HYP-003 | Three-shape sweep with plain `uint8_t` control | `outputs/quantized_baseline_sweep.md` |
 | HYP-004 | Industrial-style int8 proxy with int32 accumulation | `outputs/industrial_int8_baseline.md` |
 | HYP-005 | ONNX Runtime int8 `MatMulInteger` external-runtime baseline | `outputs/onnxruntime_int8_baseline.md` |
+| HYP-006 | GF(137) `RS(26,16)` erasure-repair audit | `outputs/gf137_erasure_repair.md` |
 
 External checks:
 
@@ -36,6 +37,7 @@ External checks:
 | GitHub Actions Ubuntu, HYP-003 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698321050> |
 | GitHub Actions Ubuntu, HYP-004 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892> |
 | GitHub Actions Ubuntu, HYP-005 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26699031559> |
+| GitHub Actions Ubuntu, HYP-006 | pending |
 | Linux VPS x86_64, HYP-002 | `outputs/vps_vds2640757_expanded_edge_kernel_replication.md` |
 | Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
 | Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
@@ -152,6 +154,29 @@ hand-written C++ int8 proxy in two of the three shapes.  This is the clearest
 current evidence that deployment-speed claims must be limited and
 shape-specific.
 
+## HYP-006: GF(137) Erasure Repair
+
+HYP-006 tests a different property from runtime speed.  It implements a small
+Reed-Solomon-style `RS(26,16)` code over GF(137):
+
+- 16 payload symbols;
+- 26 encoded axes;
+- 10 erased axes;
+- polynomial interpolation over GF(137) for exact recovery.
+
+Because 137 is prime and the 26 evaluation points are distinct, any 16
+surviving axes determine the original degree `< 16` polynomial.  The audit
+compares this against raw no-parity storage and 2x direct repetition.
+
+### HYP-006 Summary
+
+| Environment | GF(137) random repair | GF(137) adversarial repair | Raw random repair | 2x repetition random repair | Storage comparison |
+|---|---:|---:|---:|---:|---|
+| Apple ARM local | 2000/2000 | 6/6 | 0/2000 | 263/2000 | RS uses 26 symbols, repetition uses 32 |
+
+This result supports an exact finite-field erasure-repair property.  It does
+not show semantic compression, cryptographic security, or a physical law.
+
 ## Current Claim
 
 The claim supported by the current artifacts is:
@@ -166,6 +191,8 @@ The claim supported by the current artifacts is:
    HYP-004 shows a shape- and hardware-dependent boundary.
 5. Against ONNX Runtime int8, the local HYP-005 result is also shape-dependent,
    with ONNX faster on most tested shapes.
+6. GF(137) supports exact erasure repair in the tested `RS(26,16)` construction
+   after any 10 erased axes, with lower storage than 2x direct repetition.
 
 ## What This Does Not Show
 
@@ -174,6 +201,7 @@ This repository does not show that:
 - GF(137) is faster than all int8 inference implementations;
 - GF(137) is better than ONNX Runtime, TFLite, or vendor-optimized kernels;
 - the result scales to large neural networks;
+- the erasure-repair result is semantic compression or cryptographic security;
 - the result has any direct implication for fundamental physics.
 
 ## Kill Conditions
@@ -183,17 +211,20 @@ The claim should be narrowed further if:
 - an ONNX Runtime or TFLite int8 baseline dominates GF(137) on runtime,
   deployment simplicity, and memory on the target devices;
 - exact output agreement fails under frozen vectors;
+- GF(137) `RS(26,16)` recovery fails under any 10-axis erasure pattern;
 - the speed advantage over equivalent `float32` modular arithmetic disappears
   on additional external machines;
 - the benchmark depends on manual machine-specific tuning.
 
 ## Next Experiment
 
-HYP-006 should add another external runtime baseline:
+HYP-007 should connect the two engineering tracks:
 
-1. TFLite or TFLite Micro if the environment is small and reproducible.
-2. A SIMD-specific int8 dot-product kernel only after the scalar baselines are
-   fully documented.
+1. Apply the `RS(26,16)` repair layer to model weights or intermediate symbols.
+2. Measure accuracy and runtime after controlled weight erasures.
+3. Compare against standard Reed-Solomon libraries and ordinary checkpoint
+   replication.
 
-The goal of HYP-006 is not to protect the GF(137) claim.  The goal is to find
-the boundary where standard deployment tooling is better.
+The goal is not to protect the GF(137) claim.  The goal is to find whether
+finite-field repair gives a useful engineering property that standard int8
+deployment baselines do not already provide more simply.
