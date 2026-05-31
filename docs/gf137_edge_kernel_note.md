@@ -188,13 +188,14 @@ repairs the model, and verifies prediction agreement.
 
 ### HYP-007 Summary
 
-| Environment | Shapes | GF(137) random repair | GF(137) deterministic repair | Max prediction mismatches | Control boundary |
-|---|---:|---:|---:|---:|---|
-| Apple ARM local | 3 | 3/3 trials per shape | 6/6 patterns per shape | 0 | raw fails; 2x repetition is larger and adversarially unsafe |
+| Environment | Shapes | GF(137) random repair | GF(137) deterministic repair | Max prediction mismatches | Mean RS/FP32 Landauer proxy | Control boundary |
+|---|---:|---:|---:|---:|---:|---|
+| Apple ARM local | 3 | 3/3 trials per shape | 6/6 patterns per shape | 0 | 0.411 | raw fails; 2x repetition is larger and adversarially unsafe |
 
 This result connects the algebraic repair layer to checkpoint storage.  It does
-not show faster inference, better model accuracy, cryptographic security, or a
-physics result.
+not show faster inference, better model accuracy, cryptographic security,
+measured hardware joule savings, or a physics result.  The energy row is a
+Landauer lower-bound storage-bit proxy only.
 
 ## Current Claim
 
@@ -214,6 +215,9 @@ The claim supported by the current artifacts is:
    after any 10 erased axes, with lower storage than 2x direct repetition.
 7. The same repair layer can restore the tested GF(137) model checkpoints
    byte-exactly after 10 erased axes per block, preserving predictions.
+8. The repaired checkpoint path has a mean `RS/FP32` Landauer storage proxy of
+   `0.411` in the local HYP-007 audit.  This is lower-bound bit accounting, not
+   measured power.
 
 ## What This Does Not Show
 
@@ -224,6 +228,7 @@ This repository does not show that:
 - the result scales to large neural networks;
 - the erasure-repair result is semantic compression or cryptographic security;
 - repaired checkpoints improve model accuracy or runtime;
+- the Landauer proxy is measured hardware energy;
 - the result has any direct implication for fundamental physics.
 
 ## Kill Conditions

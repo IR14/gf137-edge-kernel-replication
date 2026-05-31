@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -32,7 +33,6 @@ from gf137_erasure_repair import (
     deterministic_erasure_patterns,
     encode_rs,
     erase_values,
-    random_erasure_sets,
     repetition2_success,
 )
 
@@ -40,6 +40,10 @@ from gf137_erasure_repair import (
 RESULT_JSON = ROOT / "outputs" / "repair_aware_checkpoint.json"
 RESULT_MD = ROOT / "outputs" / "repair_aware_checkpoint.md"
 MODEL_KEYS = ("w1", "b1", "w2", "b2")
+BOLTZMANN_J_PER_K = 1.380649e-23
+ROOM_TEMPERATURE_K = 300.0
+CODATA_ALPHA_INV = 137.035999084
+BARRETT_MU_137 = (1 << 32) // P_FIELD
 
 
 @dataclass(frozen=True)
@@ -59,6 +63,14 @@ class ShapeSummary:
     repetition_storage_symbols: int
     rs_expansion_vs_raw: float
     repetition_expansion_vs_raw: float
+    fp32_storage_bits: int
+    gf137_raw_storage_bits: int
+    rs_storage_bits: int
+    repetition_storage_bits: int
+    landauer_fp32_storage_j: float
+    landauer_rs_storage_j: float
+    landauer_rs_vs_fp32_ratio: float
+    landauer_rs_reduction_fraction: float
     gf137_random_successes: int
     gf137_random_trials: int
     gf137_deterministic_successes: int
@@ -150,7 +162,9 @@ def repetition_model_success(erased_by_block: list[set[int]]) -> bool:
 
 def repetition_adversarial_patterns() -> dict[str, set[int]]:
     return {
-        "erase_first_five_pairs": {idx for pair in range(5) for idx in (pair, pair + PAYLOAD_SYMBOLS)},
+        "erase_first_five_pairs": {
+            idx for pair in range(5) for idx in (pair, pair + PAYLOAD_SYMBOLS)
+        },
         "erase_middle_five_pairs": {
             idx for pair in range(5, 10) for idx in (pair, pair + PAYLOAD_SYMBOLS)
         },
@@ -158,6 +172,14 @@ def repetition_adversarial_patterns() -> dict[str, set[int]]:
             idx for pair in range(11, 16) for idx in (pair, pair + PAYLOAD_SYMBOLS)
         },
     }
+
+
+def landauer_bits_joule(bits: int, temperature_k: float = ROOM_TEMPERATURE_K) -> float:
+    return bits * BOLTZMANN_J_PER_K * temperature_k * math.log(2.0)
+
+
+def schwinger_s(alpha_inv: float = CODATA_ALPHA_INV) -> float:
+    return (1.0 / alpha_inv) / (2.0 * math.pi)
 
 
 def run_gf137_random_trials(
@@ -261,6 +283,13 @@ def run_shape(shape: ShapeConfig, seed: int, random_trials: int) -> ShapeSummary
     block_count = len(blocks)
     rs_storage = block_count * AXES
     repetition_storage = block_count * 2 * PAYLOAD_SYMBOLS
+    fp32_bits = raw_symbols * 32
+    gf137_raw_bits = raw_symbols * 8
+    rs_bits = rs_storage * 8
+    repetition_bits = repetition_storage * 8
+    fp32_landauer = landauer_bits_joule(fp32_bits)
+    rs_landauer = landauer_bits_joule(rs_bits)
+    rs_vs_fp32 = rs_landauer / fp32_landauer
     return ShapeSummary(
         shape=shape.label,
         raw_symbols=raw_symbols,
@@ -269,6 +298,14 @@ def run_shape(shape: ShapeConfig, seed: int, random_trials: int) -> ShapeSummary
         repetition_storage_symbols=repetition_storage,
         rs_expansion_vs_raw=rs_storage / raw_symbols,
         repetition_expansion_vs_raw=repetition_storage / raw_symbols,
+        fp32_storage_bits=fp32_bits,
+        gf137_raw_storage_bits=gf137_raw_bits,
+        rs_storage_bits=rs_bits,
+        repetition_storage_bits=repetition_bits,
+        landauer_fp32_storage_j=fp32_landauer,
+        landauer_rs_storage_j=rs_landauer,
+        landauer_rs_vs_fp32_ratio=rs_vs_fp32,
+        landauer_rs_reduction_fraction=1.0 - rs_vs_fp32,
         gf137_random_successes=gf_random_successes,
         gf137_random_trials=random_trials,
         gf137_deterministic_successes=gf_deterministic_successes,
@@ -329,6 +366,44 @@ def write_markdown(payload: dict) -> None:
             f"{row['repetition_adversarial_successes']}/{row['repetition_adversarial_patterns']} |"
         )
 
+    lines.extend(
+        [
+            "",
+            "## Energy-Cost Proxy",
+            "",
+            "The energy rows use Landauer's lower bound, "
+            "`E >= k_B T ln(2)` per erased bit at 300 K.  This is a storage-bit "
+            "accounting proxy, not a measured hardware power result.",
+            "",
+            "| Shape | FP32 bits | RS bits | Landauer FP32 J | Landauer RS J | RS/FP32 | Proxy reduction |",
+            "|---|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in payload["shape_summaries"]:
+        lines.append(
+            f"| {row['shape']} | {row['fp32_storage_bits']} | "
+            f"{row['rs_storage_bits']} | {row['landauer_fp32_storage_j']:.6e} | "
+            f"{row['landauer_rs_storage_j']:.6e} | "
+            f"{row['landauer_rs_vs_fp32_ratio']:.3f} | "
+            f"{row['landauer_rs_reduction_fraction']:.3f} |"
+        )
+
+    proxy = payload["operation_proxy"]
+    lines.extend(
+        [
+            "",
+            "## Operation Proxy",
+            "",
+            f"- `mac137`: {proxy['mac137']}",
+            f"- `inv137`: {proxy['inv137']}",
+            f"- `1_minus_s`: `{proxy['one_minus_s']:.12f}`",
+            "",
+            "The `1-s` factor is reported as a dimensionless model marker.  It "
+            "is not used as evidence that physical energy is reduced by exactly "
+            "`1-s`.",
+        ]
+    )
+
     lines.extend(["", "## Interpretation", "", payload["interpretation"], ""])
     RESULT_MD.write_text("\n".join(lines), encoding="utf-8")
 
@@ -359,14 +434,22 @@ def main() -> int:
         row.rs_storage_symbols < row.repetition_storage_symbols
         for row in shape_summaries
     )
+    mean_rs_vs_fp32_landauer = sum(
+        row.landauer_rs_vs_fp32_ratio for row in shape_summaries
+    ) / len(shape_summaries)
+    mean_rs_reduction = 1.0 - mean_rs_vs_fp32_landauer
+    one_minus_s = 1.0 - schwinger_s()
 
     interpretation = (
         f"GF(137) checkpoint repair pass={pass_gf137_checkpoint_repair}. "
         f"Control failure pass={pass_controls_fail}. "
         f"RS storage below 2x repetition pass={pass_storage_boundary}. "
+        f"Mean RS/FP32 Landauer storage proxy={mean_rs_vs_fp32_landauer:.3f}, "
+        f"for a proxy reduction of {mean_rs_reduction:.3f}. "
         "The result supports repair-aware finite-field checkpointing for the "
-        "tested small kernels. It does not claim faster inference, semantic "
-        "compression, cryptographic security, or a fundamental-physics result."
+        "tested small kernels. The energy-cost rows are lower-bound bit-accounting "
+        "proxies; they do not claim measured joule savings, semantic compression, "
+        "cryptographic security, or a fundamental-physics result."
     )
 
     payload = {
@@ -385,6 +468,20 @@ def main() -> int:
             "pass_gf137_checkpoint_repair": pass_gf137_checkpoint_repair,
             "pass_controls_fail": pass_controls_fail,
             "pass_storage_boundary": pass_storage_boundary,
+            "mean_rs_vs_fp32_landauer_storage_ratio": mean_rs_vs_fp32_landauer,
+            "mean_rs_landauer_storage_reduction_fraction": mean_rs_reduction,
+            "one_minus_s": one_minus_s,
+        },
+        "operation_proxy": {
+            "mac137": (
+                "uint8/int accumulator multiply-add followed by Barrett reduction "
+                f"modulo 137 with mu={BARRETT_MU_137}; this is the inference hot path."
+            ),
+            "inv137": (
+                "multiplicative inverse a^135 mod 137; used by interpolation/repair, "
+                "not by the inference hot path."
+            ),
+            "one_minus_s": one_minus_s,
         },
         "interpretation": interpretation,
     }

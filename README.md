@@ -265,6 +265,12 @@ and 2x direct repetition are included only as controls: raw storage fails under
 the erasure budget, and repetition uses more storage while failing paired
 adversarial erasures.
 
+The report also includes a limited energy-cost proxy using Landauer's lower
+bound per stored bit at 300 K.  In the current local run, repaired GF(137)
+checkpoint storage has mean `RS/FP32` proxy ratio `0.411`, corresponding to a
+mean lower-bound storage reduction of `0.589`.  This is bit accounting, not a
+measured hardware joule result.
+
 The Ubuntu CI audit also passed:
 [`run 26720900028`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26720900028).
 

@@ -31,6 +31,14 @@
       "repetition_storage_symbols": 1120,
       "rs_expansion_vs_raw": 1.6697247706422018,
       "repetition_expansion_vs_raw": 2.055045871559633,
+      "fp32_storage_bits": 17440,
+      "gf137_raw_storage_bits": 4360,
+      "rs_storage_bits": 7280,
+      "repetition_storage_bits": 8960,
+      "landauer_fp32_storage_j": 5.006987175577294e-17,
+      "landauer_rs_storage_j": 2.090072628337311e-17,
+      "landauer_rs_vs_fp32_ratio": 0.41743119266055045,
+      "landauer_rs_reduction_fraction": 0.5825688073394495,
       "gf137_random_successes": 3,
       "gf137_random_trials": 3,
       "gf137_deterministic_successes": 6,
@@ -54,6 +62,14 @@
       "repetition_storage_symbols": 4256,
       "rs_expansion_vs_raw": 1.6365357311878845,
       "repetition_expansion_vs_raw": 2.0141978230004733,
+      "fp32_storage_bits": 67616,
+      "gf137_raw_storage_bits": 16904,
+      "rs_storage_bits": 27664,
+      "repetition_storage_bits": 34048,
+      "landauer_fp32_storage_j": 1.94124108293483e-16,
+      "landauer_rs_storage_j": 7.942275987681782e-17,
+      "landauer_rs_vs_fp32_ratio": 0.40913393279697113,
+      "landauer_rs_reduction_fraction": 0.5908660672030288,
       "gf137_random_successes": 3,
       "gf137_random_trials": 3,
       "gf137_deterministic_successes": 6,
@@ -77,6 +93,14 @@
       "repetition_storage_symbols": 16672,
       "rs_expansion_vs_raw": 1.6279293354164164,
       "repetition_expansion_vs_raw": 2.0036053358971277,
+      "fp32_storage_bits": 266272,
+      "gf137_raw_storage_bits": 66568,
+      "rs_storage_bits": 108368,
+      "repetition_storage_bits": 133376,
+      "landauer_fp32_storage_j": 7.644612896876819e-16,
+      "landauer_rs_storage_j": 3.1112223981821115e-16,
+      "landauer_rs_vs_fp32_ratio": 0.4069823338541041,
+      "landauer_rs_reduction_fraction": 0.5930176661458959,
       "gf137_random_successes": 3,
       "gf137_random_trials": 3,
       "gf137_deterministic_successes": 6,
@@ -96,7 +120,15 @@
   "summary": {
     "pass_gf137_checkpoint_repair": true,
     "pass_controls_fail": true,
-    "pass_storage_boundary": true
+    "pass_storage_boundary": true,
+    "mean_rs_vs_fp32_landauer_storage_ratio": 0.4111824864372086,
+    "mean_rs_landauer_storage_reduction_fraction": 0.5888175135627913,
+    "one_minus_s": 0.9988385902671142
   },
-  "interpretation": "GF(137) checkpoint repair pass=True. Control failure pass=True. RS storage below 2x repetition pass=True. The result supports repair-aware finite-field checkpointing for the tested small kernels. It does not claim faster inference, semantic compression, cryptographic security, or a fundamental-physics result."
+  "operation_proxy": {
+    "mac137": "uint8/int accumulator multiply-add followed by Barrett reduction modulo 137 with mu=31350126; this is the inference hot path.",
+    "inv137": "multiplicative inverse a^135 mod 137; used by interpolation/repair, not by the inference hot path.",
+    "one_minus_s": 0.9988385902671142
+  },
+  "interpretation": "GF(137) checkpoint repair pass=True. Control failure pass=True. RS storage below 2x repetition pass=True. Mean RS/FP32 Landauer storage proxy=0.411, for a proxy reduction of 0.589. The result supports repair-aware finite-field checkpointing for the tested small kernels. The energy-cost rows are lower-bound bit-accounting proxies; they do not claim measured joule savings, semantic compression, cryptographic security, or a fundamental-physics result."
 }
