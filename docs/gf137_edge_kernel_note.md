@@ -44,6 +44,7 @@ External checks:
 | Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
 | Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
 | Linux VPS x86_64, HYP-005 | `outputs/vps_vds2640757_hyp005_onnxruntime_int8_baseline.md` |
+| Linux VPS x86_64, HYP-007 | `outputs/vps_vds2640757_hyp007_repair_aware_checkpoint.md` |
 
 ## HYP-002: Single-Shape Replication
 
@@ -191,6 +192,7 @@ repairs the model, and verifies prediction agreement.
 | Environment | Shapes | GF(137) random repair | GF(137) deterministic repair | Max prediction mismatches | Mean RS/FP32 Landauer proxy | Control boundary |
 |---|---:|---:|---:|---:|---:|---|
 | Apple ARM local | 3 | 3/3 trials per shape | 6/6 patterns per shape | 0 | 0.411 | raw fails; 2x repetition is larger and adversarially unsafe |
+| Linux VPS x86_64 | 3 | 3/3 trials per shape | 6/6 patterns per shape | 0 | 0.411 | raw fails; 2x repetition is larger and adversarially unsafe |
 
 This result connects the algebraic repair layer to checkpoint storage.  It does
 not show faster inference, better model accuracy, cryptographic security,

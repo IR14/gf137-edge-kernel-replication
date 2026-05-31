@@ -274,6 +274,9 @@ measured hardware joule result.
 The Ubuntu CI audit with the energy-cost proxy also passed:
 [`run 26721378170`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26721378170).
 
+The Linux/x86_64 VPS audit also passed with the same summary flags and proxy
+ratio.  See `outputs/vps_vds2640757_hyp007_repair_aware_checkpoint.md`.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
