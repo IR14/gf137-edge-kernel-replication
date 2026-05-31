@@ -139,6 +139,12 @@ replication before any stronger speed claim.
 The Ubuntu CI audit also passed:
 [`run 26698801892`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892).
 
+The Linux/x86_64 VPS audit reports the same measurement and agreement passes,
+with a shape-dependent speed result: the int8 proxy is faster on `2/3` shapes
+and GF(137) is faster on `1/3` shapes.  This narrows the claim: GF(137) remains
+compact and exact for modular inference, but it should not be presented as a
+universal replacement for standard int8 kernels.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
