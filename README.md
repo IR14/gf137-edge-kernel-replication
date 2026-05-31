@@ -235,6 +235,9 @@ repetition uses more storage while remaining unsafe against paired adversarial
 erasures.  This supports an erasure-repair claim only; it is not semantic
 compression, cryptography, or a physics result.
 
+The Ubuntu CI audit also passed:
+[`run 26710817193`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26710817193).
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.

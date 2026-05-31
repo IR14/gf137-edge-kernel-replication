@@ -37,7 +37,7 @@ External checks:
 | GitHub Actions Ubuntu, HYP-003 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698321050> |
 | GitHub Actions Ubuntu, HYP-004 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892> |
 | GitHub Actions Ubuntu, HYP-005 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26699031559> |
-| GitHub Actions Ubuntu, HYP-006 | pending |
+| GitHub Actions Ubuntu, HYP-006 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26710817193> |
 | Linux VPS x86_64, HYP-002 | `outputs/vps_vds2640757_expanded_edge_kernel_replication.md` |
 | Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
 | Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
