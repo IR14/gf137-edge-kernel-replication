@@ -179,6 +179,9 @@ Runtime int8 is faster than GF(137) on `2/3` shapes and GF(137) is faster on
 shapes in this run.  This further narrows the speed claim to finite-field
 semantics and shape-specific performance, not general int8 deployment speed.
 
+The Ubuntu CI audit also passed:
+[`run 26699031559`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26699031559).
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
