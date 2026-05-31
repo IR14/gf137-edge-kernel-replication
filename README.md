@@ -136,6 +136,9 @@ three shapes.  GF(137) is faster than the hand-written int8 proxy on `3/3`
 shapes in this local run, but this is explicitly marked for external
 replication before any stronger speed claim.
 
+The Ubuntu CI audit also passed:
+[`run 26698801892`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892).
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
