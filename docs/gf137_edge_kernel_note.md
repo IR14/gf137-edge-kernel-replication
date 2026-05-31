@@ -1,0 +1,173 @@
+# GF(137) Edge-Kernel Replication Note
+
+Date: 2026-05-31
+
+## Scope
+
+This note summarizes the current engineering replication track for the GF(137)
+edge-inference kernel.  The result is limited to small dense kernels and fixed
+deterministic test vectors.  It is not a fundamental-physics result and it is
+not a claim that GF(137) replaces standard int8 inference.
+
+The tested claim is narrower:
+
+> A byte-valued GF(137) inference kernel can reduce model storage relative to an
+> equivalent `float32` modular implementation, preserve exact output agreement,
+> and in these small kernels often run faster than equivalent modular
+> `float32` arithmetic.  Against standard int8-style inference, the speed result
+> is hardware- and shape-dependent.
+
+## Repository Evidence
+
+The current evidence is split into three hypothesis tracks:
+
+| Track | Purpose | Main output |
+|---|---|---|
+| HYP-002 | Single-shape replication against equivalent `float32` modular baselines | `outputs/edge_kernel_replication.md` |
+| HYP-003 | Three-shape sweep with plain `uint8_t` control | `outputs/quantized_baseline_sweep.md` |
+| HYP-004 | Industrial-style int8 proxy with int32 accumulation | `outputs/industrial_int8_baseline.md` |
+
+External checks:
+
+| Environment | Evidence |
+|---|---|
+| GitHub Actions Ubuntu, HYP-002 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801881> |
+| GitHub Actions Ubuntu, HYP-003 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698321050> |
+| GitHub Actions Ubuntu, HYP-004 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892> |
+| Linux VPS x86_64, HYP-002 | `outputs/vps_vds2640757_expanded_edge_kernel_replication.md` |
+| Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
+| Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
+
+## HYP-002: Single-Shape Replication
+
+HYP-002 uses one deterministic kernel shape:
+
+| Rows | Input width | Hidden width | Seed | Field |
+|---:|---:|---:|---:|---:|
+| 256 | 64 | 32 | 5137 | 137 |
+
+The expanded HYP-002 benchmark compares:
+
+- NumPy `float32` modular inference;
+- NumPy `uint32` GF(137) reference;
+- C++ portable/native `float32` modular inference;
+- C++ portable/native GF(137);
+- C++ portable/native plain `uint8_t` threshold control.
+
+The plain `uint8_t` control computes a different function and is not part of
+the exact-agreement gate.
+
+### HYP-002 Summary
+
+| Environment | Storage ratio `float32/GF137` | Speedup `NumPy float32/GF137` | Speedup `C++ float32/GF137` | Exact agreement |
+|---|---:|---:|---:|---|
+| Apple ARM local | 4.000x | 4.585x | 5.198x | pass |
+| Linux VPS x86_64 | 4.000x | 1.295x | 1.061x | pass |
+
+HYP-002 passes on both local Apple ARM and Linux VPS x86_64.  The speedup is
+large on Apple ARM and small but positive on the VPS.
+
+## HYP-003: Three-Shape Quantized Sweep
+
+HYP-003 repeats the audit across three deterministic shapes:
+
+| Label | Rows | Input width | Hidden width |
+|---|---:|---:|---:|
+| small | 128 | 32 | 16 |
+| hyp002 | 256 | 64 | 32 |
+| medium | 512 | 128 | 64 |
+
+The gate is intentionally modest:
+
+- storage ratio at least `3.9x`;
+- zero mismatches for equivalent rows;
+- GF(137) faster than equivalent C++ `float32` modular inference on at least two
+  of the three shapes.
+
+### HYP-003 Summary
+
+| Environment | Storage pass | Agreement pass | GF(137) wins vs C++ `float32` | Plain `uint8_t` faster |
+|---|---|---|---:|---:|
+| Apple ARM local | pass | pass | 3/3 | 1/3 |
+| Linux VPS x86_64 | pass | pass | 3/3 | 3/3 |
+
+This narrows the engineering claim.  GF(137) is stable against equivalent
+`float32` modular inference across the tested shapes.  Plain `uint8_t` often
+wins when the field-residue operation is removed, especially on the VPS.  That
+is not a contradiction because the plain `uint8_t` row computes a different
+function.
+
+## HYP-004: Industrial Int8 Proxy
+
+HYP-004 adds a hand-written int8 dense baseline with:
+
+- signed int8 inputs and weights;
+- int32 bias terms;
+- int32 accumulation;
+- thresholded hidden and output activations.
+
+This is still not ONNX Runtime or TFLite.  It is a dependency-light proxy for a
+standard quantized execution style.
+
+### HYP-004 Summary
+
+| Environment | Measurement pass | Agreement pass | Int8 memory profile pass | Standard int8 faster | GF(137) faster |
+|---|---|---|---|---:|---:|
+| Apple ARM local | pass | pass | pass | 0/3 | 3/3 |
+| Linux VPS x86_64 | pass | pass | pass | 2/3 | 1/3 |
+
+The HYP-004 result is the current boundary of the claim.  On Apple ARM, the
+GF(137) implementation is faster than the hand-written int8 proxy in the three
+tested shapes.  On the Linux VPS, the standard int8 proxy is faster in two of
+the three shapes.
+
+The conservative interpretation is:
+
+> GF(137) is a compact exact modular-inference representation.  It should not
+> be presented as a universal replacement for standard int8 kernels.  Its speed
+> advantage depends on the machine, compiler, shape, and baseline.
+
+## Current Claim
+
+The claim supported by the current artifacts is:
+
+1. GF(137) model storage is `4x` smaller than equivalent `float32` modular
+   storage for the tested kernel layouts.
+2. Equivalent GF(137) rows match the frozen reference outputs exactly in the
+   tested runs.
+3. GF(137) beats equivalent C++ `float32` modular arithmetic in HYP-002 and in
+   the three-shape HYP-003 sweep on both tested machines.
+4. Against standard int8-style inference, runtime is not uniformly better.
+   HYP-004 shows a shape- and hardware-dependent boundary.
+
+## What This Does Not Show
+
+This repository does not show that:
+
+- GF(137) is faster than all int8 inference implementations;
+- GF(137) is better than ONNX Runtime, TFLite, or vendor-optimized kernels;
+- the result scales to large neural networks;
+- the result has any direct implication for fundamental physics.
+
+## Kill Conditions
+
+The claim should be narrowed further if:
+
+- an ONNX Runtime or TFLite int8 baseline dominates GF(137) on runtime,
+  deployment simplicity, and memory on the target devices;
+- exact output agreement fails under frozen vectors;
+- the speed advantage over equivalent `float32` modular arithmetic disappears
+  on additional external machines;
+- the benchmark depends on manual machine-specific tuning.
+
+## Next Experiment
+
+HYP-005 should add an external runtime baseline:
+
+1. ONNX Runtime quantized dense layer if install and export are stable enough.
+2. TFLite or TFLite Micro if the environment is small and reproducible.
+3. A SIMD-specific int8 dot-product kernel only after the scalar baselines are
+   fully documented.
+
+The goal of HYP-005 is not to protect the GF(137) claim.  The goal is to find
+the boundary where standard deployment tooling is better.

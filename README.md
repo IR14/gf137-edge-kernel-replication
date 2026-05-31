@@ -29,6 +29,13 @@ path is a blind residual prediction:
 If the prediction fails, record the failure.  If it survives, narrow the claim
 and repeat on an independent dataset.
 
+## Technical Note
+
+The current GF(137) edge-kernel replication result is summarized in
+`docs/gf137_edge_kernel_note.md`.  It is the best entry point for the engineering
+track because it separates supported claims, limitations, kill conditions, and
+the next ONNX/TFLite baseline step.
+
 ## Current Fast Replication Track
 
 `HYP-002` tests whether the GF(137) edge-inference storage/runtime claim
