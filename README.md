@@ -265,6 +265,9 @@ and 2x direct repetition are included only as controls: raw storage fails under
 the erasure budget, and repetition uses more storage while failing paired
 adversarial erasures.
 
+The Ubuntu CI audit also passed:
+[`run 26720900028`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26720900028).
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.
