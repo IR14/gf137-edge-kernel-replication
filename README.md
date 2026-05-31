@@ -36,6 +36,20 @@ The current GF(137) edge-kernel replication result is summarized in
 track because it separates supported claims, limitations, kill conditions, and
 the next ONNX/TFLite baseline step.
 
+## Release Package
+
+This repository is ready for a `v0.1.0` release as:
+
+```text
+v0.1.0 - GF(137) Edge-Kernel Replication Baselines
+```
+
+Release files:
+
+- `CITATION.cff` - citation metadata;
+- `RELEASE_NOTES.md` - release scope and supported claims;
+- `REPRODUCIBILITY.md` - local, VPS, and CI reproduction checklist.
+
 ## Current Fast Replication Track
 
 `HYP-002` tests whether the GF(137) edge-inference storage/runtime claim

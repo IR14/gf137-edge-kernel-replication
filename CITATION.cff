@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this replication package, please cite it as below."
+title: "GF(137) Edge-Kernel Replication Baselines"
+version: "0.1.0"
+date-released: "2026-05-31"
+type: software
+authors:
+  - family-names: "Mikhailov"
+    given-names: "Ilia"
+    orcid: "https://orcid.org/0009-0000-9404-2698"
+repository-code: "https://github.com/IR14/gf137-edge-kernel-replication"
+url: "https://github.com/IR14/gf137-edge-kernel-replication"
+license: MIT
+keywords:
+  - GF(137)
+  - finite fields
+  - edge inference
+  - int8
+  - ONNX Runtime
+  - reproducibility
+abstract: >-
+  Reproducible engineering baseline package for a GF(137) edge-inference
+  kernel. Includes HYP-002 through HYP-005: equivalent float32 modular
+  baselines, shape sweeps, a C++ int8 proxy, an ONNX Runtime int8 baseline,
+  local Apple ARM runs, Linux VPS runs, and GitHub Actions CI. The package
+  supports a narrow claim: GF(137) provides compact exact finite-field
+  inference semantics with stable storage reduction, while runtime performance
+  against standard int8 runtimes is shape- and hardware-dependent.
