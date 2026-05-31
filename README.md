@@ -152,6 +152,33 @@ and GF(137) is faster on `1/3` shapes.  This narrows the claim: GF(137) remains
 compact and exact for modular inference, but it should not be presented as a
 universal replacement for standard int8 kernels.
 
+## Current External Runtime Baseline
+
+`HYP-005` adds ONNX Runtime with a CPU `MatMulInteger` int8 graph.  This is the
+first external-runtime baseline; it includes runtime graph execution overhead
+and provider-specific CPU kernels.
+
+Run:
+
+```bash
+./scripts/run_hyp005.sh
+python scripts/assert_hyp005_pass.py
+```
+
+Outputs:
+
+```text
+outputs/onnxruntime_int8_baseline.md
+outputs/onnxruntime_int8_baseline.json
+```
+
+The current Apple ARM audit reports valid measurements, zero mismatches on the
+equivalent GF(137) rows, and int8 model storage within `1.25x` of GF(137).  ONNX
+Runtime int8 is faster than GF(137) on `2/3` shapes and GF(137) is faster on
+`1/3` shapes.  ONNX Runtime also beats the hand-written C++ int8 proxy on `3/3`
+shapes in this run.  This further narrows the speed claim to finite-field
+semantics and shape-specific performance, not general int8 deployment speed.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.

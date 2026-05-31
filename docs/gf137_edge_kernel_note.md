@@ -26,6 +26,7 @@ The current evidence is split into three hypothesis tracks:
 | HYP-002 | Single-shape replication against equivalent `float32` modular baselines | `outputs/edge_kernel_replication.md` |
 | HYP-003 | Three-shape sweep with plain `uint8_t` control | `outputs/quantized_baseline_sweep.md` |
 | HYP-004 | Industrial-style int8 proxy with int32 accumulation | `outputs/industrial_int8_baseline.md` |
+| HYP-005 | ONNX Runtime int8 `MatMulInteger` external-runtime baseline | `outputs/onnxruntime_int8_baseline.md` |
 
 External checks:
 
@@ -127,6 +128,25 @@ The conservative interpretation is:
 > be presented as a universal replacement for standard int8 kernels.  Its speed
 > advantage depends on the machine, compiler, shape, and baseline.
 
+## HYP-005: ONNX Runtime Int8 Baseline
+
+HYP-005 adds an external runtime baseline using ONNX Runtime CPU execution with
+an int8 `MatMulInteger` graph.  The ONNX row is not functionally equivalent to
+GF(137), so it is not part of the exact-output agreement gate.  It is included
+to test the deployment boundary against a real graph runtime.
+
+### HYP-005 Summary
+
+| Environment | Runtime available | Measurement pass | Agreement pass | ONNX int8 faster | GF(137) faster |
+|---|---|---|---|---:|---:|
+| Apple ARM local | pass | pass | pass | 2/3 | 1/3 |
+
+In the current local run, ONNX Runtime int8 is faster than GF(137) in two of
+the three shapes and GF(137) is faster in one shape.  ONNX Runtime is also
+faster than the hand-written C++ int8 proxy in all three shapes.  This is the
+clearest current evidence that deployment-speed claims must be limited and
+shape-specific.
+
 ## Current Claim
 
 The claim supported by the current artifacts is:
@@ -139,6 +159,8 @@ The claim supported by the current artifacts is:
    the three-shape HYP-003 sweep on both tested machines.
 4. Against standard int8-style inference, runtime is not uniformly better.
    HYP-004 shows a shape- and hardware-dependent boundary.
+5. Against ONNX Runtime int8, the local HYP-005 result is also shape-dependent,
+   with ONNX faster on most tested shapes.
 
 ## What This Does Not Show
 
@@ -162,12 +184,11 @@ The claim should be narrowed further if:
 
 ## Next Experiment
 
-HYP-005 should add an external runtime baseline:
+HYP-006 should add another external runtime baseline:
 
-1. ONNX Runtime quantized dense layer if install and export are stable enough.
-2. TFLite or TFLite Micro if the environment is small and reproducible.
-3. A SIMD-specific int8 dot-product kernel only after the scalar baselines are
+1. TFLite or TFLite Micro if the environment is small and reproducible.
+2. A SIMD-specific int8 dot-product kernel only after the scalar baselines are
    fully documented.
 
-The goal of HYP-005 is not to protect the GF(137) claim.  The goal is to find
+The goal of HYP-006 is not to protect the GF(137) claim.  The goal is to find
 the boundary where standard deployment tooling is better.

@@ -1,0 +1,64 @@
+name: HYP-005 ONNX Runtime Int8 Baseline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/hyp005-onnxruntime-int8.yml"
+      - "hypotheses/HYP-005-onnxruntime-int8-baseline.md"
+      - "scripts/onnxruntime_int8_baseline.py"
+      - "scripts/run_hyp005.sh"
+      - "scripts/assert_hyp005_pass.py"
+      - "scripts/industrial_int8_baseline.py"
+      - "scripts/standard_int8_kernel.cpp"
+      - "scripts/edge_kernel_replication.py"
+      - "scripts/gf137_edge_kernel.cpp"
+      - "scripts/quantized_baseline_sweep.py"
+
+jobs:
+  onnxruntime-int8:
+    name: Ubuntu ONNX Runtime int8 audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Run HYP-005 ONNX Runtime audit
+        env:
+          NUMPY_SPEC: "numpy==1.26.4"
+          ONNX_SPEC: "onnx"
+          ONNXRUNTIME_SPEC: "onnxruntime"
+        run: |
+          chmod +x scripts/run_hyp005.sh
+          ./scripts/run_hyp005.sh
+
+      - name: Assert HYP-005 pass flags
+        run: |
+          python scripts/assert_hyp005_pass.py
+
+      - name: Print markdown report
+        if: always()
+        run: |
+          cat outputs/onnxruntime_int8_baseline.md
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyp005-onnxruntime-int8-baseline
+          path: |
+            outputs/onnxruntime_int8_baseline.json
+            outputs/onnxruntime_int8_baseline.md
+            outputs/build/compile_hyp005_*.log
