@@ -1,0 +1,53 @@
+name: HYP-007 Repair-Aware Checkpoint
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/hyp007-repair-aware-checkpoint.yml"
+      - "hypotheses/HYP-007-repair-aware-checkpoint.md"
+      - "scripts/repair_aware_checkpoint.py"
+      - "scripts/run_hyp007.sh"
+      - "scripts/assert_hyp007_pass.py"
+      - "scripts/edge_kernel_replication.py"
+      - "scripts/gf137_erasure_repair.py"
+
+jobs:
+  repair-aware-checkpoint:
+    name: Ubuntu repair-aware checkpoint audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run HYP-007 checkpoint repair audit
+        env:
+          NUMPY_SPEC: "numpy==1.26.4"
+        run: |
+          chmod +x scripts/run_hyp007.sh
+          ./scripts/run_hyp007.sh
+
+      - name: Assert HYP-007 pass flags
+        run: |
+          python scripts/assert_hyp007_pass.py
+
+      - name: Print markdown report
+        if: always()
+        run: |
+          cat outputs/repair_aware_checkpoint.md
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyp007-repair-aware-checkpoint
+          path: |
+            outputs/repair_aware_checkpoint.json
+            outputs/repair_aware_checkpoint.md

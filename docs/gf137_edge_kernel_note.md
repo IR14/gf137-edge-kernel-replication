@@ -19,7 +19,7 @@ The tested claim is narrower:
 
 ## Repository Evidence
 
-The current evidence is split into five hypothesis tracks:
+The current evidence is split into six hypothesis tracks:
 
 | Track | Purpose | Main output |
 |---|---|---|
@@ -28,6 +28,7 @@ The current evidence is split into five hypothesis tracks:
 | HYP-004 | Industrial-style int8 proxy with int32 accumulation | `outputs/industrial_int8_baseline.md` |
 | HYP-005 | ONNX Runtime int8 `MatMulInteger` external-runtime baseline | `outputs/onnxruntime_int8_baseline.md` |
 | HYP-006 | GF(137) `RS(26,16)` erasure-repair audit | `outputs/gf137_erasure_repair.md` |
+| HYP-007 | Repair-aware GF(137) checkpoint audit | `outputs/repair_aware_checkpoint.md` |
 
 External checks:
 
@@ -38,6 +39,7 @@ External checks:
 | GitHub Actions Ubuntu, HYP-004 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26698801892> |
 | GitHub Actions Ubuntu, HYP-005 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26699031559> |
 | GitHub Actions Ubuntu, HYP-006 | <https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26710817193> |
+| GitHub Actions Ubuntu, HYP-007 | pending |
 | Linux VPS x86_64, HYP-002 | `outputs/vps_vds2640757_expanded_edge_kernel_replication.md` |
 | Linux VPS x86_64, HYP-003 | `outputs/vps_vds2640757_hyp003_quantized_baseline_sweep.md` |
 | Linux VPS x86_64, HYP-004 | `outputs/vps_vds2640757_hyp004_industrial_int8_baseline.md` |
@@ -177,6 +179,23 @@ compares this against raw no-parity storage and 2x direct repetition.
 This result supports an exact finite-field erasure-repair property.  It does
 not show semantic compression, cryptographic security, or a physical law.
 
+## HYP-007: Repair-Aware GF(137) Checkpoints
+
+HYP-007 applies the HYP-006 repair layer to the actual checkpoint arrays used by
+the edge-kernel benchmark.  It flattens `w1`, `b1`, `w2`, and `b2` into
+16-symbol blocks, encodes every block as `RS(26,16)`, erases 10 axes per block,
+repairs the model, and verifies prediction agreement.
+
+### HYP-007 Summary
+
+| Environment | Shapes | GF(137) random repair | GF(137) deterministic repair | Max prediction mismatches | Control boundary |
+|---|---:|---:|---:|---:|---|
+| Apple ARM local | 3 | 3/3 trials per shape | 6/6 patterns per shape | 0 | raw fails; 2x repetition is larger and adversarially unsafe |
+
+This result connects the algebraic repair layer to checkpoint storage.  It does
+not show faster inference, better model accuracy, cryptographic security, or a
+physics result.
+
 ## Current Claim
 
 The claim supported by the current artifacts is:
@@ -193,6 +212,8 @@ The claim supported by the current artifacts is:
    with ONNX faster on most tested shapes.
 6. GF(137) supports exact erasure repair in the tested `RS(26,16)` construction
    after any 10 erased axes, with lower storage than 2x direct repetition.
+7. The same repair layer can restore the tested GF(137) model checkpoints
+   byte-exactly after 10 erased axes per block, preserving predictions.
 
 ## What This Does Not Show
 
@@ -202,6 +223,7 @@ This repository does not show that:
 - GF(137) is better than ONNX Runtime, TFLite, or vendor-optimized kernels;
 - the result scales to large neural networks;
 - the erasure-repair result is semantic compression or cryptographic security;
+- repaired checkpoints improve model accuracy or runtime;
 - the result has any direct implication for fundamental physics.
 
 ## Kill Conditions
@@ -212,18 +234,19 @@ The claim should be narrowed further if:
   deployment simplicity, and memory on the target devices;
 - exact output agreement fails under frozen vectors;
 - GF(137) `RS(26,16)` recovery fails under any 10-axis erasure pattern;
+- repaired GF(137) checkpoints differ from the original weights or predictions;
 - the speed advantage over equivalent `float32` modular arithmetic disappears
   on additional external machines;
 - the benchmark depends on manual machine-specific tuning.
 
 ## Next Experiment
 
-HYP-007 should connect the two engineering tracks:
+HYP-008 should compare the custom repair path with standard implementations:
 
-1. Apply the `RS(26,16)` repair layer to model weights or intermediate symbols.
-2. Measure accuracy and runtime after controlled weight erasures.
-3. Compare against standard Reed-Solomon libraries and ordinary checkpoint
-   replication.
+1. Compare against a maintained Reed-Solomon implementation with the same
+   payload and parity budget.
+2. Measure encoding and decoding latency separately from inference.
+3. Repeat HYP-007 on the Linux VPS and one constrained edge device.
 
 The goal is not to protect the GF(137) claim.  The goal is to find whether
 finite-field repair gives a useful engineering property that standard int8

@@ -238,6 +238,33 @@ compression, cryptography, or a physics result.
 The Ubuntu CI audit also passed:
 [`run 26710817193`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26710817193).
 
+## Current Checkpoint Repair Track
+
+`HYP-007` applies the same `RS(26,16)` repair layer to actual GF(137) model
+checkpoints from the edge-kernel benchmark.  It flattens `w1`, `b1`, `w2`, and
+`b2` into 16-symbol blocks, encodes each block into 26 axes, erases 10 axes per
+block, repairs the checkpoint, and verifies that predictions remain identical.
+
+Run:
+
+```bash
+NUMPY_SPEC="numpy==1.26.4" ./scripts/run_hyp007.sh
+python scripts/assert_hyp007_pass.py
+```
+
+Outputs:
+
+```text
+outputs/repair_aware_checkpoint.md
+outputs/repair_aware_checkpoint.json
+```
+
+The current Apple ARM audit reports byte-exact GF(137) checkpoint repair on all
+three shapes.  The repaired models have `0` prediction mismatches.  Raw storage
+and 2x direct repetition are included only as controls: raw storage fails under
+the erasure budget, and repetition uses more storage while failing paired
+adversarial erasures.
+
 ## Ground Rules
 
 - No post-hoc fitting after seeing the validation result.

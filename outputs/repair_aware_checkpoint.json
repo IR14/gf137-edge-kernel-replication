@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "python": "3.12.10 (main, Apr  9 2025, 03:49:38) [Clang 20.1.0 ]",
+    "numpy": "1.26.4",
+    "compiler": "/usr/bin/clang++",
+    "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  },
+  "config": {
+    "seed": 5137,
+    "random_trials": 3,
+    "field": 137,
+    "payload_symbols": 16,
+    "axes": 26,
+    "erasure_budget_per_block": 10,
+    "model_keys": [
+      "w1",
+      "b1",
+      "w2",
+      "b2"
+    ]
+  },
+  "shape_summaries": [
+    {
+      "shape": "small",
+      "raw_symbols": 545,
+      "blocks": 35,
+      "rs_storage_symbols": 910,
+      "repetition_storage_symbols": 1120,
+      "rs_expansion_vs_raw": 1.6697247706422018,
+      "repetition_expansion_vs_raw": 2.055045871559633,
+      "gf137_random_successes": 3,
+      "gf137_random_trials": 3,
+      "gf137_deterministic_successes": 6,
+      "gf137_deterministic_patterns": 6,
+      "gf137_max_prediction_mismatches": 0,
+      "raw_random_successes": 0,
+      "raw_random_trials": 3,
+      "raw_deterministic_successes": 1,
+      "raw_deterministic_patterns": 6,
+      "repetition_random_successes": 0,
+      "repetition_random_trials": 3,
+      "repetition_adversarial_successes": 0,
+      "repetition_adversarial_patterns": 3,
+      "notes": "GF(137) repair is byte-exact; controls are storage/repetition boundaries."
+    },
+    {
+      "shape": "hyp002",
+      "raw_symbols": 2113,
+      "blocks": 133,
+      "rs_storage_symbols": 3458,
+      "repetition_storage_symbols": 4256,
+      "rs_expansion_vs_raw": 1.6365357311878845,
+      "repetition_expansion_vs_raw": 2.0141978230004733,
+      "gf137_random_successes": 3,
+      "gf137_random_trials": 3,
+      "gf137_deterministic_successes": 6,
+      "gf137_deterministic_patterns": 6,
+      "gf137_max_prediction_mismatches": 0,
+      "raw_random_successes": 0,
+      "raw_random_trials": 3,
+      "raw_deterministic_successes": 1,
+      "raw_deterministic_patterns": 6,
+      "repetition_random_successes": 0,
+      "repetition_random_trials": 3,
+      "repetition_adversarial_successes": 0,
+      "repetition_adversarial_patterns": 3,
+      "notes": "GF(137) repair is byte-exact; controls are storage/repetition boundaries."
+    },
+    {
+      "shape": "medium",
+      "raw_symbols": 8321,
+      "blocks": 521,
+      "rs_storage_symbols": 13546,
+      "repetition_storage_symbols": 16672,
+      "rs_expansion_vs_raw": 1.6279293354164164,
+      "repetition_expansion_vs_raw": 2.0036053358971277,
+      "gf137_random_successes": 3,
+      "gf137_random_trials": 3,
+      "gf137_deterministic_successes": 6,
+      "gf137_deterministic_patterns": 6,
+      "gf137_max_prediction_mismatches": 0,
+      "raw_random_successes": 0,
+      "raw_random_trials": 3,
+      "raw_deterministic_successes": 1,
+      "raw_deterministic_patterns": 6,
+      "repetition_random_successes": 0,
+      "repetition_random_trials": 3,
+      "repetition_adversarial_successes": 0,
+      "repetition_adversarial_patterns": 3,
+      "notes": "GF(137) repair is byte-exact; controls are storage/repetition boundaries."
+    }
+  ],
+  "summary": {
+    "pass_gf137_checkpoint_repair": true,
+    "pass_controls_fail": true,
+    "pass_storage_boundary": true
+  },
+  "interpretation": "GF(137) checkpoint repair pass=True. Control failure pass=True. RS storage below 2x repetition pass=True. The result supports repair-aware finite-field checkpointing for the tested small kernels. It does not claim faster inference, semantic compression, cryptographic security, or a fundamental-physics result."
+}
