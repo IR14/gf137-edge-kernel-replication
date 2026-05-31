@@ -4,6 +4,8 @@
 
 Release date: 2026-05-31
 
+DOI: <https://doi.org/10.5281/zenodo.20469661>
+
 This is the first release-ready replication package for the GF(137)
 edge-kernel audit.
 

@@ -10,6 +10,7 @@ authors:
     orcid: "https://orcid.org/0009-0000-9404-2698"
 repository-code: "https://github.com/IR14/gf137-edge-kernel-replication"
 url: "https://github.com/IR14/gf137-edge-kernel-replication"
+doi: "10.5281/zenodo.20469661"
 license: MIT
 keywords:
   - GF(137)

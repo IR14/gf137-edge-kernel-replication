@@ -1,5 +1,7 @@
 # Falsifiable Physics Lab
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20469661.svg)](https://doi.org/10.5281/zenodo.20469661)
+
 This directory is an intentionally separate workspace for high-risk,
 high-standard research ideas.
 
