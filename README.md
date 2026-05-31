@@ -271,8 +271,8 @@ checkpoint storage has mean `RS/FP32` proxy ratio `0.411`, corresponding to a
 mean lower-bound storage reduction of `0.589`.  This is bit accounting, not a
 measured hardware joule result.
 
-The Ubuntu CI audit also passed:
-[`run 26720900028`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26720900028).
+The Ubuntu CI audit with the energy-cost proxy also passed:
+[`run 26721378170`](https://github.com/IR14/gf137-edge-kernel-replication/actions/runs/26721378170).
 
 ## Ground Rules
 
