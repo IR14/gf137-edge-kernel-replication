@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "platform": "Linux-6.8.0-110-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]",
+    "numpy": "1.26.4",
+    "compiler": "/usr/bin/g++",
+    "compiler_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "config": {
+    "seed": 5137,
+    "repeats": 500,
+    "trials": 3,
+    "field": 137
+  },
+  "rows": [
+    {
+      "shape": "small",
+      "backend": "NumPy float32 modular",
+      "memory_bytes": 2180,
+      "time_ms": 53.3176027238369,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 reference"
+    },
+    {
+      "shape": "small",
+      "backend": "NumPy uint32 GF(137) reference",
+      "memory_bytes": 545,
+      "time_ms": 68.91080318018794,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "vectorized Python GF(137), uint8 model storage"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 2180,
+      "time_ms": 28.66029180586338,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent C++ float32 modular kernel"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 uint8 plain threshold",
+      "memory_bytes": 545,
+      "time_ms": 12.886137701570988,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent uint8 control without residue reduction"
+    },
+    {
+      "shape": "small",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 545,
+      "time_ms": 17.612787894904613,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "optimized GF(137) kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "NumPy float32 modular",
+      "memory_bytes": 8452,
+      "time_ms": 161.46032186225057,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 reference"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "NumPy uint32 GF(137) reference",
+      "memory_bytes": 2113,
+      "time_ms": 375.3256881609559,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "vectorized Python GF(137), uint8 model storage"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 8452,
+      "time_ms": 132.79296271502972,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent C++ float32 modular kernel"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 uint8 plain threshold",
+      "memory_bytes": 2113,
+      "time_ms": 107.86934802308679,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent uint8 control without residue reduction"
+    },
+    {
+      "shape": "hyp002",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 2113,
+      "time_ms": 124.80770330876112,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "optimized GF(137) kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "NumPy float32 modular",
+      "memory_bytes": 33284,
+      "time_ms": 700.0656989403069,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent modular float32 reference"
+    },
+    {
+      "shape": "medium",
+      "backend": "NumPy uint32 GF(137) reference",
+      "memory_bytes": 8321,
+      "time_ms": 2657.093823887408,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "vectorized Python GF(137), uint8 model storage"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 float32 modular",
+      "memory_bytes": 33284,
+      "time_ms": 671.0166330449283,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "equivalent C++ float32 modular kernel"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 uint8 plain threshold",
+      "memory_bytes": 8321,
+      "time_ms": 565.0688651949167,
+      "mismatch_count": null,
+      "agreement_required": false,
+      "notes": "non-equivalent uint8 control without residue reduction"
+    },
+    {
+      "shape": "medium",
+      "backend": "C++ native O3 GF(137)",
+      "memory_bytes": 8321,
+      "time_ms": 605.9531159698963,
+      "mismatch_count": 0,
+      "agreement_required": true,
+      "notes": "optimized GF(137) kernel"
+    }
+  ],
+  "shape_summaries": [
+    {
+      "shape": {
+        "label": "small",
+        "rows": 128,
+        "input_width": 32,
+        "hidden_width": 16
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "speedup_cpp_float32_to_gf137": 1.627243340286566,
+      "speed_ratio_plain_uint8_to_gf137": 0.731635319658789,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "hyp002",
+        "rows": 256,
+        "input_width": 64,
+        "hidden_width": 32
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "speedup_cpp_float32_to_gf137": 1.063980501159563,
+      "speed_ratio_plain_uint8_to_gf137": 0.8642843763916509,
+      "equivalent_mismatches_zero": true
+    },
+    {
+      "shape": {
+        "label": "medium",
+        "rows": 512,
+        "input_width": 128,
+        "hidden_width": 64
+      },
+      "storage_ratio_float32_to_gf137": 4.0,
+      "speedup_cpp_float32_to_gf137": 1.1073738468542909,
+      "speed_ratio_plain_uint8_to_gf137": 0.9325290196593184,
+      "equivalent_mismatches_zero": true
+    }
+  ],
+  "summary": {
+    "pass_storage": true,
+    "pass_agreement": true,
+    "pass_speed_proxy": true,
+    "speed_wins_cpp_float32_shapes": 3,
+    "plain_uint8_faster_shapes": 3
+  },
+  "interpretation": "Storage pass=True. Agreement pass=True. GF(137) beats equivalent C++ float32 modular inference on 3/3 shapes. Plain uint8 is faster on 3/3 shapes, which is expected because it removes the GF(137) residue operation and computes a non-equivalent function. This sweep is a pre-freeze engineering audit and does not establish a fundamental-physics result."
+}
